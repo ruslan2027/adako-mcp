@@ -264,7 +264,20 @@ function reportError(error, err) {
 function promptSecret(question) {
   return new Promise((resolve) => {
     const isTty = process.stdin.isTTY === true
-    const rl = createInterface({ input: process.stdin, output: process.stdout, terminal: isTty })
+    // No output on a pipe: CI must not get the prompt text mixed into stdout.
+    const rl = createInterface({
+      input: process.stdin,
+      output: isTty ? process.stdout : undefined,
+      terminal: isTty,
+    })
+    let settled = false
+    const done = (/** @type {string} */ answer) => {
+      if (settled) return
+      settled = true
+      rl.close()
+      if (isTty) process.stdout.write('\n')
+      resolve(answer.trim())
+    }
     if (isTty) {
       const internal = /** @type {any} */ (rl)
       const write = internal._writeToOutput?.bind(rl)
@@ -272,10 +285,11 @@ function promptSecret(question) {
         if (chunk.includes(question) && write) write(chunk)
       }
     }
-    rl.question(question, (answer) => {
-      rl.close()
-      if (isTty) process.stdout.write('\n')
-      resolve(answer.trim())
-    })
+    // A pipe that ends without a trailing newline never answers the question: readline flushes the
+    // partial line as a plain 'line' event and then closes. Both must settle the promise, or the
+    // process exits 0 with nothing saved and nothing said.
+    rl.once('line', done)
+    rl.once('close', () => done(''))
+    rl.question(question, done)
   })
 }
