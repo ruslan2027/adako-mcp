@@ -296,6 +296,9 @@ npx adako google list-campaigns --customer-id 1234567890
 npx adako meta get-campaign-performance --date-range last_30_days --raw
 ```
 
+Its source is in [`cli/`](cli): plain ESM, no dependencies, Node 22 or newer. The published
+package is [`adako` on npm](https://www.npmjs.com/package/adako).
+
 ---
 
 ## Connect your accounts
