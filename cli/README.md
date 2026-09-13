@@ -6,14 +6,14 @@ Ads. This is the command-line client: the same tools an AI assistant calls, as o
 Zero dependencies, no build step, Node 22+.
 
 ```bash
-npx adako login                 # paste your ak_live_… key once
-npx adako google list-campaigns --customer-id 1234567890
+npx @adako/cli login            # paste your ak_live_… key once
+npx @adako/cli google list-campaigns --customer-id 1234567890
 ```
 
 Install it globally if you use it often:
 
 ```bash
-npm install -g adako
+npm install -g @adako/cli
 adako tools
 ```
 

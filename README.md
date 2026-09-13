@@ -291,13 +291,13 @@ contract, which n8n, Zapier and Make can import. Full reference:
 The `adako` command line wraps the same endpoints for scripts and coding agents:
 
 ```bash
-npx adako login
-npx adako google list-campaigns --customer-id 1234567890
-npx adako meta get-campaign-performance --date-range last_30_days --raw
+npx @adako/cli login
+npx @adako/cli google list-campaigns --customer-id 1234567890
+npx @adako/cli meta get-campaign-performance --date-range last_30_days --raw
 ```
 
 Its source is in [`cli/`](cli): plain ESM, no dependencies, Node 22 or newer. The published
-package is [`adako` on npm](https://www.npmjs.com/package/adako).
+package is [`@adako/cli` on npm](https://www.npmjs.com/package/@adako/cli).
 
 ---
 
