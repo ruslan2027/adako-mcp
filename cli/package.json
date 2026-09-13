@@ -1,0 +1,49 @@
+{
+  "name": "adako",
+  "version": "0.1.0",
+  "description": "Adako CLI — the same ad-ops tools over the REST API, for coding agents and scripts",
+  "homepage": "https://adako.ai/docs/api",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ruslan2027/adako-mcp.git",
+    "directory": "cli"
+  },
+  "bugs": {
+    "email": "support@adako.ai",
+    "url": "https://github.com/ruslan2027/adako-mcp/issues"
+  },
+  "type": "module",
+  "bin": {
+    "adako": "./bin/adako.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "!src/**/*.test.mjs",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "google-ads",
+    "meta-ads",
+    "tiktok-ads",
+    "linkedin-ads",
+    "ppc",
+    "mcp",
+    "cli"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@adako/config": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

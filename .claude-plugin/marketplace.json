@@ -1,0 +1,37 @@
+{
+  "name": "adako",
+  "owner": {
+    "name": "Adako",
+    "email": "support@adako.ai",
+    "url": "https://adako.ai"
+  },
+  "plugins": [
+    {
+      "name": "adako",
+      "source": "./plugin",
+      "displayName": "Adako",
+      "description": "Careful ad ops for Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. Reads run instantly; every write becomes a proposal you approve. Created campaigns are paused.",
+      "version": "0.2.0",
+      "author": {
+        "name": "Adako",
+        "email": "support@adako.ai",
+        "url": "https://adako.ai"
+      },
+      "homepage": "https://adako.ai/docs",
+      "repository": "https://github.com/ruslan2027/adako-mcp",
+      "license": "MIT",
+      "category": "marketing",
+      "keywords": [
+        "ads",
+        "google-ads",
+        "meta-ads",
+        "tiktok-ads",
+        "linkedin-ads",
+        "ad-ops"
+      ]
+    }
+  ],
+  "metadata": {
+    "description": "Adako: careful ad ops for AI agents. Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads through one MCP server; every write becomes a proposal you approve."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "adako": {
+      "type": "http",
+      "url": "https://adako.ai/mcp"
+    }
+  }
+}

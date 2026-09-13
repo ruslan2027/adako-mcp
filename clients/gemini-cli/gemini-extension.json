@@ -1,0 +1,14 @@
+{
+  "name": "adako",
+  "version": "0.2.0",
+  "description": "Careful ad ops for Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. Reads run instantly; every write becomes a proposal you approve.",
+  "mcpServers": {
+    "adako": {
+      "httpUrl": "https://adako.ai/mcp",
+      "headers": {
+        "Authorization": "Bearer ${ADAKO_API_KEY}"
+      }
+    }
+  },
+  "contextFileName": "GEMINI.md"
+}

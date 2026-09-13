@@ -1,0 +1,13 @@
+# Adako — Codex CLI
+#
+# Merge this block into ~/.codex/config.toml, or run:
+#   codex mcp add adako --url https://adako.ai/mcp
+#
+# Auth: leave the bearer keys out to use OAuth (Codex stores the credentials for you),
+# or export an Adako API key and keep bearer_token_env_var.
+#   export ADAKO_API_KEY=ak_live_your_key
+# Create keys at https://adako.ai/keys
+
+[mcp_servers.adako]
+url = "https://adako.ai/mcp"
+bearer_token_env_var = "ADAKO_API_KEY"
