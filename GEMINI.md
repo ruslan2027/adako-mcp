@@ -35,7 +35,7 @@ side rather than guessing at a cause. If the data does not support a claim, leav
 
 ### Routers
 
-Your tool list holds 22 entries: 15 tools callable by name and 7 routers. The other 216 tools are
+Your tool list holds 28 entries: 15 tools callable by name and 13 routers. The other 216 tools are
 reached through a router.
 
 Directly callable: `start_here`, `get_connections_status`, `list_connected_accounts`,
@@ -44,8 +44,20 @@ Directly callable: `start_here`, `get_connections_status`, `list_connected_accou
 `meta_get_campaign_performance`, `chatgpt_get_performance`, `tiktok_get_campaign_performance`,
 `linkedin_get_campaign_performance`.
 
-Routers: `google_ads`, `meta_ads`, `chatgpt_ads`, `tiktok_ads`, `linkedin_ads`, `monitoring`,
-`diagnostics`. Each takes:
+Routers come in pairs: a read router for reads and lookups, and a `_write` router for changes.
+
+| Read router    | Write router         |
+| -------------- | -------------------- |
+| `google_ads`   | `google_ads_write`   |
+| `meta_ads`     | `meta_ads_write`     |
+| `chatgpt_ads`  | `chatgpt_ads_write`  |
+| `tiktok_ads`   | `tiktok_ads_write`   |
+| `linkedin_ads` | `linkedin_ads_write` |
+| `monitoring`   | `monitoring_write`   |
+
+`diagnostics` has no write tools and stays a single read router.
+
+A read router takes:
 
 ```
 router(action="list_tools")
@@ -53,11 +65,28 @@ router(action="get_tool_schema", tool_name="…")
 router(action="execute", tool_name="…", arguments={...})
 ```
 
-`list_tools` and `get_tool_schema` are free and instant. `execute` runs the tool and bills its cost.
-Calling a routed tool by its own name fails with tool-not-found, so copy the call line:
+`list_tools` and `get_tool_schema` are free and instant, and cover every tool of that router,
+changes included. `execute` runs read tools only and bills their cost.
+
+A `_write` router takes one action and runs write tools only. Each call becomes a proposal:
+
+```
+router_write(action="execute", tool_name="…", arguments={...})
+```
+
+Never look anything up through a `_write` router. It has no `list_tools`, no `get_tool_schema` and no
+`accounts`. A read sent there is refused with a pointer back to the read router; a change sent to
+the read router is refused with the exact `_write` call. Nothing runs either way.
+
+Looking things up never changes an account, so an assistant that asks permission per tool can allow
+reads once. Every change runs through the `_write` tool, which asks each time and creates a proposal.
+
+Calling a routed tool by its own name fails with tool-not-found, so copy the call line that
+`search_tools` or `get_tool_schema` returns:
 
 ```
 google_ads(action="execute", tool_name="google_analyze_search_terms", arguments={"customer_id":"1234567890","date_range":"last_30_days"})
+google_ads_write(action="execute", tool_name="google_pause_campaign", arguments={...})
 ```
 
 ### Finding the right tool
@@ -85,15 +114,16 @@ the id of the one the user means. Get ids from `start_here` or `list_connected_a
 
 ### Fan-out across accounts
 
-A platform router takes `accounts` on read tools:
+A platform read router takes `accounts` on read tools:
 
 ```
 meta_ads(action="execute", tool_name="meta_analyze_wasted_spend", arguments={"date_range":"last_30_days"}, accounts="all_active")
 ```
 
 `accounts` is a list of ids or the literal `"all_active"`. Runs sequentially, returns one
-consolidated answer, bills one task per account, caps at 20. Read tools only; a write with `accounts`
-is refused. Never average metrics across accounts in different currencies.
+consolidated answer, free like every read, caps at 20. Read tools only; the `_write` routers take
+no `accounts`, so a change always names one account. Never average metrics across accounts in
+different currencies.
 
 ### Arguments
 
@@ -135,7 +165,8 @@ manual alternative: run the review yourself when the user asks.
 ## 4. Tool map
 
 231 tools. Names only here; `references/tool-cheatsheet.md` has one line each with risk, cost and
-when to use, and `get_tool_schema` has the arguments.
+when to use, and `get_tool_schema` has the arguments. Routed tools marked W or D there run through
+the `_write` router; the rest run through the read router.
 
 ### Adako itself (31)
 
@@ -150,13 +181,13 @@ when to use, and `get_tool_schema` has the arguments.
 `validate_campaign_draft` · `why_did_this_fail` · `verify_campaign_is_live` · `suggest_next_action` ·
 `list_what_i_can_do` · `usage_value_summary`
 
-**Monitors** (8, router `monitoring`) `create_monitor` · `update_monitor` · `list_monitors` ·
+**Monitors** (8, routers `monitoring` and `monitoring_write`) `create_monitor` · `update_monitor` · `list_monitors` ·
 `get_monitor_history` · `test_monitor` · `delete_monitor` · `list_pending_actions` · `manage_action`
 
-**Briefs and reports** (5, router `monitoring`) `schedule_brief` · `generate_report_now` ·
-`list_scheduled_tasks` · `manage_scheduled_task` · `list_reports`
+**Briefs and reports** (5, routers `monitoring` and `monitoring_write`) `schedule_brief` ·
+`generate_report_now` · `list_scheduled_tasks` · `manage_scheduled_task` · `list_reports`
 
-### Google Ads (70, router `google_ads`, `customer_id`)
+### Google Ads (70, routers `google_ads` and `google_ads_write`, `customer_id`)
 
 **structure** `google_list_campaigns` · `google_get_campaign_structure` · `google_get_ad_creative` ·
 `google_list_asset_groups`
@@ -198,7 +229,7 @@ when to use, and `get_tool_schema` has the arguments.
 **audiences** `google_get_search_themes` · `google_add_search_themes` ·
 `google_remove_search_themes` · `google_add_audience_signal` · `google_search_audiences`
 
-### Meta Ads (43, router `meta_ads`, `ad_account_id`)
+### Meta Ads (43, routers `meta_ads` and `meta_ads_write`, `ad_account_id`)
 
 **structure** `meta_list_campaigns` · `meta_list_ad_sets` · `meta_list_ads` · `meta_list_lead_forms` ·
 `meta_get_lead_form_submissions`
@@ -230,7 +261,7 @@ when to use, and `get_tool_schema` has the arguments.
 `meta_update_campaign` · `meta_update_ad_set` · `meta_update_ad` · `meta_update_campaign_budget` ·
 `meta_set_frequency_cap` · `meta_duplicate_campaign`
 
-### ChatGPT Ads (23, router `chatgpt_ads`, `ad_account_id`)
+### ChatGPT Ads (23, routers `chatgpt_ads` and `chatgpt_ads_write`, `ad_account_id`)
 
 **discovery** `chatgpt_get_account` · `chatgpt_get_account_limits`
 
@@ -250,7 +281,7 @@ when to use, and `get_tool_schema` has the arguments.
 `chatgpt_pause_campaign` · `chatgpt_resume_campaign` · `chatgpt_pause_ad_group` ·
 `chatgpt_resume_ad_group` · `chatgpt_pause_ad` · `chatgpt_resume_ad` · `chatgpt_archive_campaign`
 
-### TikTok Ads (30, router `tiktok_ads`, `advertiser_id`)
+### TikTok Ads (30, routers `tiktok_ads` and `tiktok_ads_write`, `advertiser_id`)
 
 **structure** `tiktok_list_campaigns` · `tiktok_get_campaign_details` · `tiktok_list_ad_groups` ·
 `tiktok_list_ads`
@@ -277,7 +308,7 @@ when to use, and `get_tool_schema` has the arguments.
 `tiktok_resume_campaign` · `tiktok_pause_ad_group` · `tiktok_resume_ad_group` · `tiktok_pause_ad` ·
 `tiktok_resume_ad`
 
-### LinkedIn Ads (34, router `linkedin_ads`, `ad_account_id`)
+### LinkedIn Ads (34, routers `linkedin_ads` and `linkedin_ads_write`, `ad_account_id`)
 
 **discovery** `linkedin_get_organizations` · `linkedin_explain_objectives`
 
@@ -460,8 +491,9 @@ Every error carries a `code`, a `message` and `recovery_steps`. Follow the steps
 
 The same 231 tools run over REST: `POST /api/v1/tools/{tool_name}/execute` with an API key, an
 `Idempotency-Key` header and a JSON envelope. `GET /api/v1/tools` lists them and
-`GET /api/v1/openapi.json` is the machine-readable contract. Routers and `search_tools` are MCP only;
-over REST the URL is the dispatch.
+`GET /api/v1/openapi.json` is the machine-readable contract. Routers, read and `_write`, are MCP
+only; over REST the URL is the dispatch. `search_tools` and `get_tool_schema` run over REST as well, and their call lines come
+back as the REST request to send.
 
 The `adako` npm package wraps the same REST endpoints as a command line, for scripts and coding
 agents: `adako google list-campaigns --customer-id 1234567890`. Same pipeline, same quota, same

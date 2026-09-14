@@ -4,6 +4,26 @@ Adako is an MCP server and REST API that connects Claude, ChatGPT, Cursor and ot
 Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. This file tracks what changed in the
 service and in this repository.
 
+## 0.3.0
+
+- **Reads and changes are separate tools.** Every router that can change something now has a
+  `_write` pair: `google_ads_write`, `meta_ads_write`, `chatgpt_ads_write`, `tiktok_ads_write`,
+  `linkedin_ads_write` and `monitoring_write`. Looking things up never changes an account, so an
+  assistant that asks permission per tool can allow reads once. Every change runs through the
+  `_write` tool, which asks each time and creates a proposal.
+- **Read routers are read-only.** `google_ads`, `meta_ads`, `chatgpt_ads`, `tiktok_ads`,
+  `linkedin_ads` and `monitoring` still list every tool, changes included, return any schema, and
+  run reads, fan-out across accounts included. "Show my campaigns" no longer asks for approval.
+- **Write routers only execute changes**, one account at a time:
+  `google_ads_write(action="execute", tool_name="google_pause_campaign", arguments={...})`.
+  Proposals, approval in the chat or in the web app, and paused creation work as before.
+- **A change sent to a read router runs nothing.** It returns the exact `_write` call to use. A read
+  sent to a `_write` router points back to the read router.
+- **The approval card only appears for changes.** It is attached to the `_write` routers, so it no
+  longer opens on reads.
+- `diagnostics` has no write tools and stays one read-only router. Tools callable by name, the REST
+  API and the `adako` command line are unchanged.
+
 ## 0.2.1
 
 - **Gemini CLI extension** at the root of this repository:

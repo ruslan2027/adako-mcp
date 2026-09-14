@@ -1,7 +1,7 @@
 {
   "name": "adako",
   "description": "Ad ops for Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads from Cursor. Reads run instantly; every write becomes a proposal you approve. Created campaigns are paused.",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "author": {
     "name": "Adako",
     "email": "support@adako.ai"

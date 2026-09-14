@@ -23,6 +23,10 @@ Check first, propose second. Every validator below is free and instant.
 `get_campaign_spec` on the `diagnostics` router returns the full field list and asset rules for any
 campaign type, and `validate_campaign_draft` checks a whole draft at once.
 
+The validators run through each platform's read router (`google_ads`, `meta_ads` and so on). The
+tools below that add an ad, cap frequency or pause run through its `_write` router
+(`meta_ads_write` and so on), and each one becomes a proposal.
+
 ## Google Ads
 
 **Responsive search ad**

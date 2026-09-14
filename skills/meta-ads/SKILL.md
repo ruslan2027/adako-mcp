@@ -8,13 +8,17 @@ license: MIT
 
 Adako is an MCP server and REST API that connects Claude, ChatGPT, Cursor and other assistants to
 Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. This skill covers Meta Ads: 43 tools
-behind the `meta_ads` router.
+behind two routers, `meta_ads` for reads and `meta_ads_write` for changes.
 
 ```
 meta_ads(action="execute", tool_name="meta_list_ad_sets", arguments={"ad_account_id":"act_123456789"})
+meta_ads_write(action="execute", tool_name="meta_pause_entity", arguments={...})
 ```
 
-`meta_get_campaign_performance` is callable by name. Everything else goes through the router.
+`meta_get_campaign_performance` is callable by name. The Create, Change and Pause and resume tools
+below go through `meta_ads_write`, and each one becomes a proposal the user approves. Everything else
+goes through `meta_ads`, where `list_tools` and `get_tool_schema` are free for every Meta tool,
+changes included. Never look anything up through `meta_ads_write`.
 
 ## Account contract
 

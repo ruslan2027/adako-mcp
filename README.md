@@ -31,11 +31,18 @@ installers, a Claude Code plugin, and the MCP Registry entry. The server itself 
 | ChatGPT Ads  | 23    | Chat card campaigns end to end, account limits, pixels, review verdicts                                                                                                         |
 | Adako        | 31    | Connections and usage, tool discovery, proposals, diagnostics, monitors, briefs and reports                                                                                     |
 
-Your client does not see 231 entries. It sees 15 tools callable by name plus 7 routers
-(`google_ads`, `meta_ads`, `chatgpt_ads`, `tiktok_ads`, `linkedin_ads`, `monitoring`,
-`diagnostics`), and reaches the rest with
-`google_ads(action="execute", tool_name="…", arguments={...})`. `search_tools` finds the right one
-from your own wording, and it is free. See [adako.ai/docs/routers](https://adako.ai/docs/routers).
+Your client does not see 231 entries. It sees 15 tools callable by name plus 13 routers. Each
+platform has a read router (`google_ads`, `meta_ads`, `chatgpt_ads`, `tiktok_ads`, `linkedin_ads`)
+and a write router beside it (`google_ads_write`, `meta_ads_write`, `chatgpt_ads_write`,
+`tiktok_ads_write`, `linkedin_ads_write`). Monitors have `monitoring` and `monitoring_write`, and
+`diagnostics` only reads. A read looks like
+`google_ads(action="execute", tool_name="google_list_campaigns", arguments={...})`, a change like
+`google_ads_write(action="execute", tool_name="google_pause_campaign", arguments={...})`.
+
+Looking things up never changes an account, so an assistant that asks permission per tool can allow
+reads once. Every change runs through a `_write` tool, which asks each time and creates a proposal.
+`search_tools` finds the right tool from your own wording and returns its exact call line, and it is
+free. See [adako.ai/docs/routers](https://adako.ai/docs/routers).
 
 TikTok Ads and LinkedIn Ads are available on request; write to support@adako.ai if you do not see
 them on the Connections page.
@@ -356,8 +363,8 @@ Every one of those ends with a proposal you approve or reject.
 
 Free includes 1 active ad account and 30 tasks a month. Pro ($49/month) covers 5 active accounts and
 600 tasks, Agency ($149/month) 20 accounts and 5,000 tasks, and Enterprise is priced per contract. A
-task is one billed tool call; connection, usage, proposal, discovery, diagnostic and resolver tools
-are free. Monitors, scheduled briefs and generated reports need Pro or above. Details at
+task is one billed change to an ad account; reads and connection, usage, proposal, discovery,
+diagnostic and resolver tools are free. Monitors, scheduled briefs and generated reports need Pro or above. Details at
 [adako.ai/pricing](https://adako.ai/pricing).
 
 ## Docs

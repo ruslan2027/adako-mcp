@@ -10,11 +10,17 @@ Adako is an MCP server and REST API that connects Claude, ChatGPT, Cursor and ot
 Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. This skill covers the watching half:
 rules that run once a day on Adako's own copy of the account, briefs by email, and reports on demand.
 
-All 13 tools sit behind the `monitoring` router:
+The 13 tools sit behind two routers. Reads and tests go through `monitoring`. The tools that save,
+change or remove something (`create_monitor`, `update_monitor`, `delete_monitor`, `manage_action`,
+`schedule_brief`, `generate_report_now`, `manage_scheduled_task`) go through `monitoring_write`:
 
 ```
 monitoring(action="execute", tool_name="list_monitors", arguments={})
+monitoring_write(action="execute", tool_name="create_monitor", arguments={...})
 ```
+
+`list_tools` and `get_tool_schema` on `monitoring` are free and cover all 13. Never look anything up
+through `monitoring_write`.
 
 They cost no tasks. `create_monitor`, `update_monitor`, `schedule_brief` and `generate_report_now`
 need the **Pro plan or above**; on Free they return `plan_required` with the upgrade link.

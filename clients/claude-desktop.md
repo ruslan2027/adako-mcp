@@ -43,6 +43,9 @@ tasks. If nothing is connected, connect Google Ads or Meta Ads at
 ## What to expect
 
 - Reads answer straight away.
+- Claude asks before using each tool. Reading tools such as `google_ads` or `meta_ads` never change
+  an account, so you can allow them once. Changes run through the `_write` tools
+  (`google_ads_write`, `meta_ads_write`, …), which ask each time.
 - A change request comes back as a proposal with the object, the before and after values, and the
   daily cost. Nothing is sent to the ad platform until you approve it.
 - Proposals also appear at [adako.ai/approvals](https://adako.ai/approvals) and expire after 48 hours.

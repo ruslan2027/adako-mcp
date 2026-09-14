@@ -98,8 +98,9 @@ many tasks remain. If nothing is connected yet, it hands you the link to
 
 ## Notes
 
-- Reads run without a prompt. Writes come back as a proposal with a preview; Claude Code shows it and
-  waits for you.
+- Reading tools such as `google_ads` never change an account, so allow them once when Claude Code
+  asks. Changes run through the `_write` tools (`google_ads_write`, …), which ask each time and come
+  back as a proposal with a preview; Claude Code shows it and waits for you.
 - Created campaigns, ad sets and ads are always paused.
 - If a tool returns `needs_reauth`, the platform login expired. Reconnect at
   [adako.ai/connections](https://adako.ai/connections); no restart needed.

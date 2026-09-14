@@ -9,9 +9,15 @@ platforms plus Adako itself.
 - **Cost**: Adako tasks. `0` is free and never counted.
 - **Pro+**: the tool needs the Pro plan or above.
 
-How to call: the tools in the client tool list are called by name. Everything else goes through its router:
-`google_ads`, `meta_ads`, `chatgpt_ads`, `tiktok_ads`, `linkedin_ads`, `monitoring`, `diagnostics`, called as
-`router(action="execute", tool_name="…", arguments={...})`. Tools marked **direct** below are callable by name.
+How to call: the tools in the client tool list are called by name: every System, Discovery and Proposals tool, and the
+tools marked **direct** below. Everything else goes through a router, as
+`router(action="execute", tool_name="…", arguments={...})`:
+
+- **R** tools run through the read router: `google_ads`, `meta_ads`, `chatgpt_ads`, `tiktok_ads`, `linkedin_ads`,
+  `monitoring` or `diagnostics`. Its `list_tools` and `get_tool_schema` are free and cover every tool, changes included.
+- **W** and **D** tools run through the matching `_write` router: `google_ads_write`, `meta_ads_write`,
+  `chatgpt_ads_write`, `tiktok_ads_write`, `linkedin_ads_write` or `monitoring_write`. It only executes, and each call
+  becomes a proposal. Never look anything up through it.
 
 ## Adako system: 31 tools
 
@@ -78,32 +84,32 @@ How to call: the tools in the client tool list are called by name. Everything el
 
 ## Google Ads: 70 tools
 
-Router: `google_ads`. Account argument: `customer_id`.
+Routers: `google_ads` for R, `google_ads_write` for W and D. Account argument: `customer_id`.
 
 ### Structure (4)
 
 | Tool                            | Risk | Cost | When to use                                                                                                                                                                                  |
 | ------------------------------- | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `google_list_campaigns`         | R    | 1    | Lists the campaigns in a Google Ads account with their state, campaign type, bidding strategy, daily budget (shared or not) and last-30-day spend, clicks and conversions.                   |
-| `google_get_campaign_structure` | R    | 1    | Returns the inside of one campaign: its ad groups, the keywords in each (text, match type, state, quality score) and the responsive search ads (headlines, descriptions, display paths, fin… |
-| `google_get_ad_creative`        | R    | 1    | Returns the actual copy of responsive search ads: every headline and description, the display paths, the final URLs, the ad strength and Google's approval status.                           |
-| `google_list_asset_groups`      | R    | 1    | Lists the asset groups in the account or in one Performance Max campaign, with their status, final URL and the ad strength Google assigns.                                                   |
+| `google_list_campaigns`         | R    | 0    | Lists the campaigns in a Google Ads account with their state, campaign type, bidding strategy, daily budget (shared or not) and last-30-day spend, clicks and conversions.                   |
+| `google_get_campaign_structure` | R    | 0    | Returns the inside of one campaign: its ad groups, the keywords in each (text, match type, state, quality score) and the responsive search ads (headlines, descriptions, display paths, fin… |
+| `google_get_ad_creative`        | R    | 0    | Returns the actual copy of responsive search ads: every headline and description, the display paths, the final URLs, the ad strength and Google's approval status.                           |
+| `google_list_asset_groups`      | R    | 0    | Lists the asset groups in the account or in one Performance Max campaign, with their status, final URL and the ad strength Google assigns.                                                   |
 
 ### Performance (5)
 
 | Tool                                       | Risk | Cost | When to use                                                                                                                                                                                  |
 | ------------------------------------------ | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `google_get_campaign_performance` (direct) | R    | 1    | Reports spend, impressions, clicks, CTR, conversions, conversion value, CPA and ROAS per campaign for a period, plus the change against the immediately preceding period of the same length. |
-| `google_get_ad_group_performance`          | R    | 1    | Reports spend, clicks, CTR, conversions, CPA and ROAS per ad group for a period, optionally inside one campaign, ordered by spend.                                                           |
-| `google_get_ad_performance`                | R    | 1    | Reports spend, clicks, CTR, conversions, CPA and ROAS for each ad, next to the immediately preceding period of the same length so the direction is visible.                                  |
-| `google_get_asset_group_performance`       | R    | 1    | Reports spend, clicks, conversions, CPA and ROAS per Performance Max asset group for the period.                                                                                             |
-| `google_get_device_performance`            | R    | 1    | Splits spend, clicks, conversions, CPA and ROAS by device (mobile, desktop, tablet) for the period, next to the previous period of the same length.                                          |
+| `google_get_campaign_performance` (direct) | R    | 0    | Reports spend, impressions, clicks, CTR, conversions, conversion value, CPA and ROAS per campaign for a period, plus the change against the immediately preceding period of the same length. |
+| `google_get_ad_group_performance`          | R    | 0    | Reports spend, clicks, CTR, conversions, CPA and ROAS per ad group for a period, optionally inside one campaign, ordered by spend.                                                           |
+| `google_get_ad_performance`                | R    | 0    | Reports spend, clicks, CTR, conversions, CPA and ROAS for each ad, next to the immediately preceding period of the same length so the direction is visible.                                  |
+| `google_get_asset_group_performance`       | R    | 0    | Reports spend, clicks, conversions, CPA and ROAS per Performance Max asset group for the period.                                                                                             |
+| `google_get_device_performance`            | R    | 0    | Splits spend, clicks, conversions, CPA and ROAS by device (mobile, desktop, tablet) for the period, next to the previous period of the same length.                                          |
 
 ### Keywords (7)
 
 | Tool                                | Risk | Cost | When to use                                                                                                                  |
 | ----------------------------------- | ---- | ---- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `google_get_keyword_performance`    | R    | 1    | Reports the highest-spending keywords for a period with match type, state, quality score, clicks, conversions, CPA and ROAS. |
+| `google_get_keyword_performance`    | R    | 0    | Reports the highest-spending keywords for a period with match type, state, quality score, clicks, conversions, CPA and ROAS. |
 | `google_add_keywords`               | W    | 1    | Adds keywords to one existing ad group, with an optional max CPC per keyword.                                                |
 | `google_add_negative_keywords`      | W    | 1    | Blocks queries from triggering ads anywhere in one campaign.                                                                 |
 | `google_update_keyword`             | D    | 1    | Pauses, re-enables or re-bids one keyword.                                                                                   |
@@ -115,31 +121,31 @@ Router: `google_ads`. Account argument: `customer_id`.
 
 | Tool                                 | Risk | Cost | When to use                                                                                                                                                                                  |
 | ------------------------------------ | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `google_analyze_search_terms`        | R    | 1    | Reads the actual queries people typed before an ad showed, then sorts them into three buckets: converting (at least one conversion), wasted (spend above the threshold with no conversions)… |
-| `google_analyze_wasted_spend`        | R    | 1    | Finds keywords, and the campaigns they sit in, that spent real money over the period and recorded zero conversions.                                                                          |
-| `google_explain_performance_anomaly` | R    | 1    | Decomposes a period-over-period change in one metric across campaigns, devices, networks, countries and search terms, and ranks the segments by how much of the total change each one accou… |
-| `google_optimize_budget_allocation`  | R    | 1    | Produces a **plan** for moving budget between campaigns, based on what each one currently returns and whether it is actually budget-limited.                                                 |
-| `google_get_geo_performance`         | R    | 1    | Splits spend, clicks, conversions, CPA and ROAS by country for the period, using Google's geographic report.                                                                                 |
-| `google_get_hourly_performance`      | R    | 1    | Splits performance by hour of day and by day of week, in the account timezone.                                                                                                               |
+| `google_analyze_search_terms`        | R    | 0    | Reads the actual queries people typed before an ad showed, then sorts them into three buckets: converting (at least one conversion), wasted (spend above the threshold with no conversions)… |
+| `google_analyze_wasted_spend`        | R    | 0    | Finds keywords, and the campaigns they sit in, that spent real money over the period and recorded zero conversions.                                                                          |
+| `google_explain_performance_anomaly` | R    | 0    | Decomposes a period-over-period change in one metric across campaigns, devices, networks, countries and search terms, and ranks the segments by how much of the total change each one accou… |
+| `google_optimize_budget_allocation`  | R    | 0    | Produces a **plan** for moving budget between campaigns, based on what each one currently returns and whether it is actually budget-limited.                                                 |
+| `google_get_geo_performance`         | R    | 0    | Splits spend, clicks, conversions, CPA and ROAS by country for the period, using Google's geographic report.                                                                                 |
+| `google_get_hourly_performance`      | R    | 0    | Splits performance by hour of day and by day of week, in the account timezone.                                                                                                               |
 | `google_get_benchmark_context`       | R    | 0    | Returns indicative Google Search medians — click-through rate, cost per click and landing-page conversion rate — for an industry.                                                            |
 
 ### Targeting (6)
 
 | Tool                               | Risk | Cost | When to use                                                                                                                                                                       |
 | ---------------------------------- | ---- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `google_get_campaign_targeting`    | R    | 1    | Shows who and where a campaign is targeting: locations (with the resolved place names and any exclusions), languages, ad schedule, device bid adjustments and attached audiences. |
+| `google_get_campaign_targeting`    | R    | 0    | Shows who and where a campaign is targeting: locations (with the resolved place names and any exclusions), languages, ad schedule, device bid adjustments and attached audiences. |
 | `google_list_languages`            | R    | 0    | Returns Google's language constant ids, which google_update_campaign_languages needs.                                                                                             |
 | `google_update_campaign_locations` | D    | 1    | Adds or removes the locations a campaign targets.                                                                                                                                 |
 | `google_update_campaign_languages` | D    | 1    | Replaces the set of languages a campaign targets.                                                                                                                                 |
-| `google_get_ad_schedule`           | R    | 1    | Returns the campaign's ad schedule: which days and hours it may serve, and the bid modifier on each block.                                                                        |
+| `google_get_ad_schedule`           | R    | 0    | Returns the campaign's ad schedule: which days and hours it may serve, and the bid modifier on each block.                                                                        |
 | `google_set_ad_schedule`           | D    | 1    | Replaces a campaign's whole ad schedule with the blocks you pass.                                                                                                                 |
 
 ### Conversions (4)
 
 | Tool                                       | Risk | Cost | When to use                                                                                                                                                                                  |
 | ------------------------------------------ | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `google_list_conversion_actions`           | R    | 1    | Lists the conversion actions set up on the account: name, state, category, how each one counts (every conversion or one per click), whether it is included in the "Conversions" column, and… |
-| `google_get_conversion_action_performance` | R    | 1    | Reports, per conversion action, how many conversions it recorded in the period, their value, and whether it counts towards the "Conversions" column that Smart Bidding optimises against.    |
+| `google_list_conversion_actions`           | R    | 0    | Lists the conversion actions set up on the account: name, state, category, how each one counts (every conversion or one per click), whether it is included in the "Conversions" column, and… |
+| `google_get_conversion_action_performance` | R    | 0    | Reports, per conversion action, how many conversions it recorded in the period, their value, and whether it counts towards the "Conversions" column that Smart Bidding optimises against.    |
 | `google_update_conversion_action`          | D    | 1    | Changes one conversion action: its status, category, counting type, default value, click-through window, or whether it counts towards the Conversions column.                                |
 | `google_create_conversion_action`          | W    | 1    | Creates a website (WEBPAGE) conversion action so the account can record a goal.                                                                                                              |
 
@@ -147,7 +153,7 @@ Router: `google_ads`. Account argument: `customer_id`.
 
 | Tool                       | Risk | Cost | When to use                                                                                                                                                                                  |
 | -------------------------- | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `google_research_keywords` | R    | 1    | Asks Google Keyword Planner for keyword ideas from seed terms or a landing page, and returns average monthly searches, competition and the top-of-page bid range for each.                   |
+| `google_research_keywords` | R    | 0    | Asks Google Keyword Planner for keyword ideas from seed terms or a landing page, and returns average monthly searches, competition and the top-of-page bid range for each.                   |
 | `google_resolve_locations` | R    | 0    | Converts place names ("Berlin", "California", "United Kingdom") into the numeric geo target constant ids the write tools require.                                                            |
 | `google_validate_ad_copy`  | R    | 0    | Checks headlines, descriptions and display paths against the responsive search ad rules before anything is sent to Google: at most 15 headlines of 30 characters, at most 4 descriptions of… |
 
@@ -170,12 +176,12 @@ Router: `google_ads`. Account argument: `customer_id`.
 | `google_pause_ad_group`           | D    | 1    | Stops one ad group inside a campaign from serving, leaving the rest of the campaign running.                                                                                 |
 | `google_resume_ad_group`          | W    | 1    | Turns a paused ad group back on.                                                                                                                                             |
 | `google_update_bid_strategy`      | D    | 1    | Changes how a campaign bids: maximise conversions (optionally with a target CPA), maximise conversion value (optionally with a target ROAS), maximise clicks, or manual CPC. |
-| `google_list_bidding_strategies`  | R    | 1    | Lists the portfolio (shared) bidding strategies in the account, their type, their target and how many campaigns use each one.                                                |
+| `google_list_bidding_strategies`  | R    | 0    | Lists the portfolio (shared) bidding strategies in the account, their type, their target and how many campaigns use each one.                                                |
 | `google_pause_ad`                 | D    | 1    | Stops one ad from serving, leaving the rest of the ad group running.                                                                                                         |
 | `google_resume_ad`                | W    | 1    | Turns a paused ad back on.                                                                                                                                                   |
 | `google_update_campaign_networks` | D    | 1    | Turns a Search campaign's two extra networks on or off: Google search partners (other search sites) and display expansion (the Display Network with leftover budget).        |
 | `google_set_device_bid_modifiers` | D    | 1    | Sets the bid multiplier for phones, computers and tablets on one campaign.                                                                                                   |
-| `google_list_labels`              | R    | 1    | Lists the labels defined in the account and the campaigns and ad groups each one is applied to.                                                                              |
+| `google_list_labels`              | R    | 0    | Lists the labels defined in the account and the campaigns and ad groups each one is applied to.                                                                              |
 | `google_create_label`             | W    | 1    | Creates a label in the account.                                                                                                                                              |
 | `google_apply_label`              | W    | 1    | Applies an existing label to campaigns and/or ad groups.                                                                                                                     |
 | `google_remove_label`             | D    | 1    | Removes the link between a label and the campaigns or ad groups you list.                                                                                                    |
@@ -184,7 +190,7 @@ Router: `google_ads`. Account argument: `customer_id`.
 
 | Tool                                 | Risk | Cost | When to use                                                                                                                                                                                  |
 | ------------------------------------ | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `google_list_assets`                 | R    | 1    | Lists the assets (extensions) that exist in the account and which campaigns or ad groups they are linked to.                                                                                 |
+| `google_list_assets`                 | R    | 0    | Lists the assets (extensions) that exist in the account and which campaigns or ad groups they are linked to.                                                                                 |
 | `google_add_sitelinks`               | W    | 1    | Creates sitelink assets and links them to the account, a campaign or an ad group.                                                                                                            |
 | `google_add_callouts`                | W    | 1    | Creates callout assets — short, non-clickable phrases such as "Free shipping" or "Cancel anytime" — and links them to the account, a campaign or an ad group.                                |
 | `google_add_structured_snippets`     | W    | 1    | Creates a structured snippet asset — a fixed header such as "Types" or "Brands" followed by 3–10 values — and links it to the account, a campaign or an ad group.                            |
@@ -193,57 +199,57 @@ Router: `google_ads`. Account argument: `customer_id`.
 | `google_add_image_assets`            | W    | 1    | Downloads images from https URLs, checks them against Google's rules (PNG/JPEG/static GIF, at most 5120 KB, the aspect ratio and minimum size of the slot they are for) and uploads the one… |
 | `google_remove_asset_links`          | D    | 1    | Removes the link between an asset and a campaign, ad group or the account, so the extension stops serving there.                                                                             |
 | `google_validate_and_prepare_assets` | R    | 0    | Checks assets against Google's published rules without writing anything: image URLs are downloaded and measured (format, file size, dimensions, aspect ratio for the slot), text is length-… |
-| `google_get_asset_performance`       | R    | 1    | Returns Google's per-asset performance labels for responsive search ads — BEST, GOOD, LOW, LEARNING or PENDING — for each headline and description, with the impressions behind them.        |
+| `google_get_asset_performance`       | R    | 0    | Returns Google's per-asset performance labels for responsive search ads — BEST, GOOD, LOW, LEARNING or PENDING — for each headline and description, with the impressions behind them.        |
 
 ### Audiences (5)
 
 | Tool                          | Risk | Cost | When to use                                                                                                                                                                             |
 | ----------------------------- | ---- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `google_get_search_themes`    | R    | 1    | Lists the signals on a Performance Max asset group: the search themes and the audience signals, with Google's approval status for each.                                                 |
+| `google_get_search_themes`    | R    | 0    | Lists the signals on a Performance Max asset group: the search themes and the audience signals, with Google's approval status for each.                                                 |
 | `google_add_search_themes`    | W    | 1    | Adds search themes to a Performance Max asset group.                                                                                                                                    |
 | `google_remove_search_themes` | D    | 1    | Removes search themes from a Performance Max asset group.                                                                                                                               |
 | `google_add_audience_signal`  | W    | 1    | Adds an audience as a signal on a Performance Max asset group.                                                                                                                          |
-| `google_search_audiences`     | R    | 1    | Finds audiences usable in this account: the account's own audiences and remarketing/customer lists, plus Google's in-market and affinity interest segments when you pass a search term. |
+| `google_search_audiences`     | R    | 0    | Finds audiences usable in this account: the account's own audiences and remarketing/customer lists, plus Google's in-market and affinity interest segments when you pass a search term. |
 
 ## Meta Ads: 43 tools
 
-Router: `meta_ads`. Account argument: `ad_account_id`.
+Routers: `meta_ads` for R, `meta_ads_write` for W and D. Account argument: `ad_account_id`.
 
 ### Structure (5)
 
 | Tool                             | Risk | Cost | When to use                                                                                                                                                                         |
 | -------------------------------- | ---- | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `meta_list_campaigns`            | R    | 1    | Lists the campaigns in a Meta ad account with objective, delivery status, budget (as a decimal in the account currency), bid strategy and any Advantage+ state the account exposes. |
-| `meta_list_ad_sets`              | R    | 1    | Lists ad sets with budget, optimisation goal, billing event, a one-line targeting summary, schedule and learning-phase state.                                                       |
-| `meta_list_ads`                  | R    | 1    | Lists individual ads with delivery status, the creative behind each one and a preview link the user can open.                                                                       |
-| `meta_list_lead_forms`           | R    | 1    | Lists the instant (lead gen) forms attached to the Pages this ad account can advertise from, with how many leads each has collected and what it asks for.                           |
-| `meta_get_lead_form_submissions` | R    | 2    | Reads the submissions of one lead form: when each lead arrived, which ad and campaign produced it, and the answers given.                                                           |
+| `meta_list_campaigns`            | R    | 0    | Lists the campaigns in a Meta ad account with objective, delivery status, budget (as a decimal in the account currency), bid strategy and any Advantage+ state the account exposes. |
+| `meta_list_ad_sets`              | R    | 0    | Lists ad sets with budget, optimisation goal, billing event, a one-line targeting summary, schedule and learning-phase state.                                                       |
+| `meta_list_ads`                  | R    | 0    | Lists individual ads with delivery status, the creative behind each one and a preview link the user can open.                                                                       |
+| `meta_list_lead_forms`           | R    | 0    | Lists the instant (lead gen) forms attached to the Pages this ad account can advertise from, with how many leads each has collected and what it asks for.                           |
+| `meta_get_lead_form_submissions` | R    | 0    | Reads the submissions of one lead form: when each lead arrived, which ad and campaign produced it, and the answers given.                                                           |
 
 ### Performance (3)
 
 | Tool                                     | Risk | Cost | When to use                                                                                                                                                                                  |
 | ---------------------------------------- | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `meta_get_campaign_performance` (direct) | R    | 1    | Campaign-level results for a window, next to the same-length window before it, with the KPI each campaign's objective is actually judged on: purchases and purchase ROAS for sales, leads a… |
-| `meta_get_adset_performance`             | R    | 1    | Ad-set level results with the objective's own KPI and a previous-period comparison, optionally split by a breakdown (age and gender, publisher platform and position, device, or country).   |
-| `meta_get_ad_performance`                | R    | 1    | Ad-level results joined with the creative behind each ad (creative name and thumbnail), plus the previous-period comparison.                                                                 |
+| `meta_get_campaign_performance` (direct) | R    | 0    | Campaign-level results for a window, next to the same-length window before it, with the KPI each campaign's objective is actually judged on: purchases and purchase ROAS for sales, leads a… |
+| `meta_get_adset_performance`             | R    | 0    | Ad-set level results with the objective's own KPI and a previous-period comparison, optionally split by a breakdown (age and gender, publisher platform and position, device, or country).   |
+| `meta_get_ad_performance`                | R    | 0    | Ad-level results joined with the creative behind each ad (creative name and thumbnail), plus the previous-period comparison.                                                                 |
 
 ### Analysis (6)
 
 | Tool                           | Risk | Cost | When to use                                                                                                                                                                                 |
 | ------------------------------ | ---- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `meta_analyze_wasted_spend`    | R    | 1    | Finds ad sets that spent money and produced no results in the window, and ad sets whose cost per result is far above the account's own average.                                             |
-| `meta_detect_creative_fatigue` | R    | 2    | Compares the first days of a window with the last days, per ad, and flags creative fatigue: click-through rate falling while frequency and CPM rise.                                        |
-| `meta_get_audience_insights`   | R    | 2    | Splits spend and results by one audience dimension: age, gender, age and gender together, country, region, platform, device or placement position.                                          |
-| `meta_analyze_audiences`       | R    | 2    | Ranks the segments of one audience dimension against the account average on the metric that matches the objective: ROAS where revenue exists, otherwise cost per result.                    |
-| `meta_optimize_placements`     | R    | 2    | Breaks spend and results down by placement (platform and position) and says which placements cost far more per result than the account average.                                             |
-| `meta_optimize_budget`         | R    | 2    | Compares the ad sets in a campaign (or the whole account) on cost per result — or ROAS where revenue exists — and produces a reallocation plan: which budgets to raise, which to lower, by… |
+| `meta_analyze_wasted_spend`    | R    | 0    | Finds ad sets that spent money and produced no results in the window, and ad sets whose cost per result is far above the account's own average.                                             |
+| `meta_detect_creative_fatigue` | R    | 0    | Compares the first days of a window with the last days, per ad, and flags creative fatigue: click-through rate falling while frequency and CPM rise.                                        |
+| `meta_get_audience_insights`   | R    | 0    | Splits spend and results by one audience dimension: age, gender, age and gender together, country, region, platform, device or placement position.                                          |
+| `meta_analyze_audiences`       | R    | 0    | Ranks the segments of one audience dimension against the account average on the metric that matches the objective: ROAS where revenue exists, otherwise cost per result.                    |
+| `meta_optimize_placements`     | R    | 0    | Breaks spend and results down by placement (platform and position) and says which placements cost far more per result than the account average.                                             |
+| `meta_optimize_budget`         | R    | 0    | Compares the ad sets in a campaign (or the whole account) on cost per result — or ROAS where revenue exists — and produces a reallocation plan: which budgets to raise, which to lower, by… |
 
 ### Targeting (4)
 
 | Tool                                | Risk | Cost | When to use                                                                                                                                                                                  |
 | ----------------------------------- | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `meta_search_targeting`             | R    | 0    | Turns a plain-language audience description into the ids Meta's write endpoints require: interest ids, behaviour ids, and location keys for countries, regions, cities, postcodes and media… |
-| `meta_get_ad_set_delivery_estimate` | R    | 1    | Asks Meta how many people an ad set's current targeting could reach, and how many of them are reachable daily at the ad set's optimisation goal.                                             |
+| `meta_get_ad_set_delivery_estimate` | R    | 0    | Asks Meta how many people an ad set's current targeting could reach, and how many of them are reachable daily at the ad set's optimisation goal.                                             |
 | `meta_get_ad_set_targeting`         | R    | 0    | Renders one ad set's targeting exactly as Meta holds it: locations, age, gender, detailed targeting, custom audiences, placements, devices and the Advantage+ audience setting.              |
 | `meta_browse_targeting`             | R    | 0    | Walks Meta's targeting catalogue by category — interests, behaviours, demographics, life events, industries — instead of searching for a word.                                               |
 
@@ -251,8 +257,8 @@ Router: `meta_ads`. Account argument: `ad_account_id`.
 
 | Tool                           | Risk | Cost | When to use                                                                                                                                                     |
 | ------------------------------ | ---- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `meta_list_pages`              | R    | 1    | Lists the Facebook Pages this ad account may advertise from, with any Instagram account linked to each one.                                                     |
-| `meta_get_ad_creatives`        | R    | 1    | Lists the creatives used by one ad, or by every ad in an ad set: headline, primary text, destination link, format and thumbnail.                                |
+| `meta_list_pages`              | R    | 0    | Lists the Facebook Pages this ad account may advertise from, with any Instagram account linked to each one.                                                     |
+| `meta_get_ad_creatives`        | R    | 0    | Lists the creatives used by one ad, or by every ad in an ad set: headline, primary text, destination link, format and thumbnail.                                |
 | `meta_list_instagram_accounts` | R    | 0    | Lists the Instagram accounts this ad account may use as the ad's identity, both the ones linked directly to the ad account and the ones connected to its Pages. |
 | `meta_list_promotable_apps`    | R    | 0    | Lists the mobile apps registered to this ad account's business that can be advertised, with their store URLs.                                                   |
 
@@ -260,13 +266,13 @@ Router: `meta_ads`. Account argument: `ad_account_id`.
 
 | Tool               | Risk | Cost | When to use                                                                                                                                                 |
 | ------------------ | ---- | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `meta_list_pixels` | R    | 1    | Lists the pixels on the ad account with the time each one last received an event, and the standard events it has recently recorded where Meta exposes them. |
+| `meta_list_pixels` | R    | 0    | Lists the pixels on the ad account with the time each one last received an event, and the standard events it has recently recorded where Meta exposes them. |
 
 ### Audiences (2)
 
 | Tool                         | Risk | Cost | When to use                                                                                                                                          |
 | ---------------------------- | ---- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `meta_list_custom_audiences` | R    | 1    | Lists the saved custom and lookalike audiences on the ad account with their type, approximate size and whether Meta considers them usable right now. |
+| `meta_list_custom_audiences` | R    | 0    | Lists the saved custom and lookalike audiences on the ad account with their type, approximate size and whether Meta considers them usable right now. |
 | `meta_list_saved_audiences`  | R    | 0    | Lists the saved audiences in the ad account: the reusable targeting definitions someone built in Ads Manager, with their size estimate.              |
 
 ### Diagnostics (2)
@@ -274,7 +280,7 @@ Router: `meta_ads`. Account argument: `ad_account_id`.
 | Tool                         | Risk | Cost | When to use                                                                                                                                                                 |
 | ---------------------------- | ---- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `meta_validate_creative_url` | R    | 0    | Fetches a public image URL and reports whether it is reachable, what type and size it is, and its pixel dimensions, then checks any ad copy against Meta's length guidance. |
-| `meta_explain_anomaly`       | R    | 2    | Compares a window with the equally long window before it and attributes the change to the ad sets, placements, countries or age-and-gender groups that caused it.           |
+| `meta_explain_anomaly`       | R    | 0    | Compares a window with the equally long window before it and attributes the change to the ad sets, placements, countries or age-and-gender groups that caused it.           |
 
 ### Creation (7)
 
@@ -304,7 +310,7 @@ Router: `meta_ads`. Account argument: `ad_account_id`.
 
 ## ChatGPT Ads: 23 tools
 
-Router: `chatgpt_ads`. Account argument: `ad_account_id`.
+Routers: `chatgpt_ads` for R, `chatgpt_ads_write` for W and D. Account argument: `ad_account_id`.
 
 ### Discovery (2)
 
@@ -317,22 +323,22 @@ Router: `chatgpt_ads`. Account argument: `ad_account_id`.
 
 | Tool                     | Risk | Cost | When to use                                                                                                                                                                                  |
 | ------------------------ | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `chatgpt_list_campaigns` | R    | 1    | Lists the campaigns in the advertiser account with status, objective, what the platform bids towards, the lifetime and daily spend limits as decimals in the account currency, the schedule… |
-| `chatgpt_list_ad_groups` | R    | 1    | Lists ad groups with status, bidding configuration (what the account is billed on, the strategy, and any fixed maximum bid as a decimal in the account currency), the free-text context hin… |
-| `chatgpt_list_ads`       | R    | 1    | Lists individual ads with their status, the chat card behind each one (title, body, destination) and — most usefully — the platform's review verdict and reason.                             |
+| `chatgpt_list_campaigns` | R    | 0    | Lists the campaigns in the advertiser account with status, objective, what the platform bids towards, the lifetime and daily spend limits as decimals in the account currency, the schedule… |
+| `chatgpt_list_ad_groups` | R    | 0    | Lists ad groups with status, bidding configuration (what the account is billed on, the strategy, and any fixed maximum bid as a decimal in the account currency), the free-text context hin… |
+| `chatgpt_list_ads`       | R    | 0    | Lists individual ads with their status, the chat card behind each one (title, body, destination) and — most usefully — the platform's review verdict and reason.                             |
 
 ### Conversions (2)
 
 | Tool                         | Risk | Cost | When to use                                                                                                                                                                                  |
 | ---------------------------- | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `chatgpt_list_pixels`        | R    | 1    | Lists the measurement pixels on the advertiser account, when each last received an event, and whether a Conversions API key exists for it.                                                   |
-| `chatgpt_get_pixel_settings` | R    | 1    | Reads one pixel in detail: when it last received an event, whether a Conversions API key exists, and the conversion event settings on it — the ids a conversions campaign optimises towards. |
+| `chatgpt_list_pixels`        | R    | 0    | Lists the measurement pixels on the advertiser account, when each last received an event, and whether a Conversions API key exists for it.                                                   |
+| `chatgpt_get_pixel_settings` | R    | 0    | Reads one pixel in detail: when it last received an event, whether a Conversions API key exists, and the conversion event settings on it — the ids a conversions campaign optimises towards. |
 
 ### Performance (1)
 
 | Tool                               | Risk | Cost | When to use                                                                                                                                                                                  |
 | ---------------------------------- | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `chatgpt_get_performance` (direct) | R    | 1    | Reports impressions, clicks, spend, conversions and the ratios derived from them (CTR, CPC, CPM, CPA, ROAS) for a window, broken down by campaign, ad group or ad — and compares every numb… |
+| `chatgpt_get_performance` (direct) | R    | 0    | Reports impressions, clicks, spend, conversions and the ratios derived from them (CTR, CPC, CPM, CPA, ROAS) for a window, broken down by campaign, ad group or ad — and compares every numb… |
 
 ### Targeting (1)
 
@@ -371,38 +377,38 @@ Router: `chatgpt_ads`. Account argument: `ad_account_id`.
 
 ## TikTok Ads: 30 tools
 
-Router: `tiktok_ads`. Account argument: `advertiser_id`.
+Routers: `tiktok_ads` for R, `tiktok_ads_write` for W and D. Account argument: `advertiser_id`.
 
 ### Structure (4)
 
 | Tool                          | Risk | Cost | When to use                                                                                                                                                                                  |
 | ----------------------------- | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tiktok_list_campaigns`       | R    | 1    | Lists the campaigns in a TikTok advertiser account with objective, on/off state, budget and budget mode, and the delivery status TikTok computed for each one.                               |
-| `tiktok_get_campaign_details` | R    | 1    | Reads one campaign together with every ad group under it: objective, budget and mode, and per ad group the optimisation goal, billing event, bid, schedule, placements and targeting (locat… |
-| `tiktok_list_ad_groups`       | R    | 1    | Lists ad groups with their on/off state, TikTok's delivery status, budget and mode, optimisation goal, billing event, bid and schedule.                                                      |
-| `tiktok_list_ads`             | R    | 1    | Lists individual ads with their on/off state, delivery status, the video and cover images behind each one, the ad text and call to action, the destination URL and — most usefully — TikTok… |
+| `tiktok_list_campaigns`       | R    | 0    | Lists the campaigns in a TikTok advertiser account with objective, on/off state, budget and budget mode, and the delivery status TikTok computed for each one.                               |
+| `tiktok_get_campaign_details` | R    | 0    | Reads one campaign together with every ad group under it: objective, budget and mode, and per ad group the optimisation goal, billing event, bid, schedule, placements and targeting (locat… |
+| `tiktok_list_ad_groups`       | R    | 0    | Lists ad groups with their on/off state, TikTok's delivery status, budget and mode, optimisation goal, billing event, bid and schedule.                                                      |
+| `tiktok_list_ads`             | R    | 0    | Lists individual ads with their on/off state, delivery status, the video and cover images behind each one, the ad text and call to action, the destination URL and — most usefully — TikTok… |
 
 ### Performance (3)
 
 | Tool                                       | Risk | Cost | When to use                                                                                                                                                                                  |
 | ------------------------------------------ | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tiktok_get_campaign_performance` (direct) | R    | 1    | Reports spend, impressions, reach, clicks, conversions and the TikTok video metrics — 2-second and 6-second views, completion, average watch time — per campaign, and compares every number… |
-| `tiktok_get_ad_group_performance`          | R    | 1    | Reports the same metrics one level down: per ad group, with the previous-period comparison.                                                                                                  |
-| `tiktok_get_ad_performance`                | R    | 1    | Reports per ad: spend, impressions, clicks, conversions and the full set of video metrics, with the previous-period comparison.                                                              |
+| `tiktok_get_campaign_performance` (direct) | R    | 0    | Reports spend, impressions, reach, clicks, conversions and the TikTok video metrics — 2-second and 6-second views, completion, average watch time — per campaign, and compares every number… |
+| `tiktok_get_ad_group_performance`          | R    | 0    | Reports the same metrics one level down: per ad group, with the previous-period comparison.                                                                                                  |
+| `tiktok_get_ad_performance`                | R    | 0    | Reports per ad: spend, impressions, clicks, conversions and the full set of video metrics, with the previous-period comparison.                                                              |
 
 ### Analysis (2)
 
 | Tool                             | Risk | Cost | When to use                                                                                                                                                                  |
 | -------------------------------- | ---- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tiktok_get_audience_insights`   | R    | 1    | Breaks spend, impressions, CTR, conversions and CPA down by age, gender, placement, device OS or language for a window.                                                      |
-| `tiktok_analyze_geo_performance` | R    | 1    | Breaks spend, impressions, CTR, conversions and CPA down by country for a window, ranked by spend, and flags countries taking meaningful budget with nothing to show for it. |
+| `tiktok_get_audience_insights`   | R    | 0    | Breaks spend, impressions, CTR, conversions and CPA down by age, gender, placement, device OS or language for a window.                                                      |
+| `tiktok_analyze_geo_performance` | R    | 0    | Breaks spend, impressions, CTR, conversions and CPA down by country for a window, ranked by spend, and flags countries taking meaningful budget with nothing to show for it. |
 
 ### Diagnostics (2)
 
 | Tool                             | Risk | Cost | When to use                                                                                                                                                                                 |
 | -------------------------------- | ---- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tiktok_analyze_wasted_spend`    | R    | 1    | Lists the ad groups and ads that spent real money over a window and produced no conversions, excluding anything still in its learning period or too thin to judge.                          |
-| `tiktok_detect_creative_fatigue` | R    | 1    | Compares the first and second halves of a window per ad and flags the ones whose hook rate, CTR or CPA have moved against them while frequency climbed — the signature of creative fatigue… |
+| `tiktok_analyze_wasted_spend`    | R    | 0    | Lists the ad groups and ads that spent real money over a window and produced no conversions, excluding anything still in its learning period or too thin to judge.                          |
+| `tiktok_detect_creative_fatigue` | R    | 0    | Compares the first and second halves of a window per ad and flags the ones whose hook rate, CTR or CPA have moved against them while frequency climbed — the signature of creative fatigue… |
 
 ### Targeting (1)
 
@@ -455,7 +461,7 @@ Router: `tiktok_ads`. Account argument: `advertiser_id`.
 
 ## LinkedIn Ads: 34 tools
 
-Router: `linkedin_ads`. Account argument: `ad_account_id`.
+Routers: `linkedin_ads` for R, `linkedin_ads_write` for W and D. Account argument: `ad_account_id`.
 
 ### Discovery (2)
 
@@ -468,44 +474,44 @@ Router: `linkedin_ads`. Account argument: `ad_account_id`.
 
 | Tool                              | Risk | Cost | When to use                                                                                                                                                          |
 | --------------------------------- | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `linkedin_list_campaign_groups`   | R    | 1    | Lists the campaign groups in the ad account with their status, lifetime budget and run dates.                                                                        |
-| `linkedin_list_campaigns`         | R    | 1    | Lists campaigns with their group, status, objective, format, bid, daily and total budget, schedule, audience-expansion settings and a one-line targeting summary.    |
-| `linkedin_get_campaign_structure` | R    | 1    | Returns the whole account in one call: every campaign group, the campaigns inside it, and the creatives inside those, with status and budget at each level.          |
-| `linkedin_list_creatives`         | R    | 1    | Lists the creatives attached to one or more campaigns, with their intended status, whether they are actually serving, their review verdict and any rejection reason. |
+| `linkedin_list_campaign_groups`   | R    | 0    | Lists the campaign groups in the ad account with their status, lifetime budget and run dates.                                                                        |
+| `linkedin_list_campaigns`         | R    | 0    | Lists campaigns with their group, status, objective, format, bid, daily and total budget, schedule, audience-expansion settings and a one-line targeting summary.    |
+| `linkedin_get_campaign_structure` | R    | 0    | Returns the whole account in one call: every campaign group, the campaigns inside it, and the creatives inside those, with status and budget at each level.          |
+| `linkedin_list_creatives`         | R    | 0    | Lists the creatives attached to one or more campaigns, with their intended status, whether they are actually serving, their review verdict and any rejection reason. |
 
 ### Performance (2)
 
 | Tool                                         | Risk | Cost | When to use                                                                                                                                                                             |
 | -------------------------------------------- | ---- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `linkedin_get_campaign_performance` (direct) | R    | 1    | Reports spend, impressions, clicks, CTR, CPC, CPM, leads, cost per lead and website conversions for a window, next to the equally long window before it so every number has a baseline. |
-| `linkedin_get_creative_performance`          | R    | 1    | Reports spend, impressions, clicks, CTR, CPC, leads and cost per lead for each creative in a campaign.                                                                                  |
+| `linkedin_get_campaign_performance` (direct) | R    | 0    | Reports spend, impressions, clicks, CTR, CPC, CPM, leads, cost per lead and website conversions for a window, next to the equally long window before it so every number has a baseline. |
+| `linkedin_get_creative_performance`          | R    | 0    | Reports spend, impressions, clicks, CTR, CPC, leads and cost per lead for each creative in a campaign.                                                                                  |
 
 ### Briefs and reports (1)
 
 | Tool                              | Risk | Cost | When to use                                                                                                                                                                                  |
 | --------------------------------- | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `linkedin_get_engagement_metrics` | R    | 1    | Reports the social half of LinkedIn delivery: reactions, comments, shares, page follows, total engagements and engagement rate, plus video views and completions where the creative is a vi… |
+| `linkedin_get_engagement_metrics` | R    | 0    | Reports the social half of LinkedIn delivery: reactions, comments, shares, page follows, total engagements and engagement rate, plus video views and completions where the creative is a vi… |
 
 ### Analysis (2)
 
 | Tool                                    | Risk | Cost | When to use                                                                                                                                                                                  |
 | --------------------------------------- | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `linkedin_analyze_creative_performance` | R    | 1    | Ranks a campaign's creatives against each other on CTR and cost per lead, and flags the ones whose CTR fell sharply in the second half of the window — the signature of creative fatigue on… |
-| `linkedin_analyze_wasted_spend`         | R    | 1    | Finds campaigns spending without result: impressions with no clicks, clicks with no leads or conversions, and cost per lead well above the account average or a ceiling you give.            |
+| `linkedin_analyze_creative_performance` | R    | 0    | Ranks a campaign's creatives against each other on CTR and cost per lead, and flags the ones whose CTR fell sharply in the second half of the window — the signature of creative fatigue on… |
+| `linkedin_analyze_wasted_spend`         | R    | 0    | Finds campaigns spending without result: impressions with no clicks, clicks with no leads or conversions, and cost per lead well above the account average or a ceiling you give.            |
 
 ### Audiences (1)
 
 | Tool                             | Risk | Cost | When to use                                                                                                         |
 | -------------------------------- | ---- | ---- | ------------------------------------------------------------------------------------------------------------------- |
-| `linkedin_get_audience_insights` | R    | 1    | Breaks delivery down by who saw it: job title, industry, seniority, company size, country, job function or company. |
+| `linkedin_get_audience_insights` | R    | 0    | Breaks delivery down by who saw it: job title, industry, seniority, company size, country, job function or company. |
 
 ### Targeting (3)
 
 | Tool                                | Risk | Cost | When to use                                                                                                                                                                                  |
 | ----------------------------------- | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `linkedin_search_targeting`         | R    | 0    | Turns plain words into the LinkedIn targeting URNs a campaign actually accepts — job titles, industries, seniorities, company-size bands, locations, skills, interests, member behaviours,…  |
-| `linkedin_estimate_audience_size`   | R    | 1    | Counts how many LinkedIn members a targeting spec reaches, before a campaign is created against it.                                                                                          |
-| `linkedin_forecast_campaign_supply` | R    | 1    | Asks LinkedIn what a targeting spec is likely to deliver and what the auction currently costs: an impression and click forecast, and the bid range for the objective and cost type you inte… |
+| `linkedin_estimate_audience_size`   | R    | 0    | Counts how many LinkedIn members a targeting spec reaches, before a campaign is created against it.                                                                                          |
+| `linkedin_forecast_campaign_supply` | R    | 0    | Asks LinkedIn what a targeting spec is likely to deliver and what the auction currently costs: an impression and click forecast, and the bid range for the objective and cost type you inte… |
 
 ### Assets (1)
 
@@ -517,7 +523,7 @@ Router: `linkedin_ads`. Account argument: `ad_account_id`.
 
 | Tool                            | Risk | Cost | When to use                                                                                                                                                                  |
 | ------------------------------- | ---- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `linkedin_list_conversions`     | R    | 1    | Lists the account's conversion rules with their type, tracking method, attribution windows, assigned value and — most importantly — which campaigns each one is attached to. |
+| `linkedin_list_conversions`     | R    | 0    | Lists the account's conversion rules with their type, tracking method, attribution windows, assigned value and — most importantly — which campaigns each one is attached to. |
 | `linkedin_manage_conversions`   | W    | 1    | Creates a conversion rule on the account, or edits an existing one's name, value, attribution windows or enabled state.                                                      |
 | `linkedin_associate_conversion` | W    | 1    | Attaches a conversion rule to a campaign, or detaches it, so LinkedIn reports that conversion against that campaign's spend.                                                 |
 

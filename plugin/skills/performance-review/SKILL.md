@@ -10,7 +10,8 @@ Adako is an MCP server and REST API that connects Claude, ChatGPT, Cursor and ot
 Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. This skill is the reading half: how
 to answer "how are we doing" with numbers that hold up.
 
-Reads run immediately and change nothing. Each costs one task unless marked free.
+Reads run immediately, change nothing and are free. Every call in a review is a read, so none of
+them goes through a `_write` router.
 
 ## Start
 
@@ -32,7 +33,7 @@ both. A number without its baseline is not an answer.
 | TikTok Ads   | `tiktok_get_campaign_performance`   | yes              |
 | LinkedIn Ads | `linkedin_get_campaign_performance` | yes              |
 
-Everything deeper goes through the router:
+Everything deeper goes through the platform's read router:
 `google_ads(action="execute", tool_name="google_get_ad_group_performance", arguments={...})`.
 
 ## Judge each objective on its own metric
@@ -91,14 +92,13 @@ as money and share of spend, not as a list of ids.
 
 ## Several accounts at once
 
-A platform router fans a read out across accounts:
+A platform read router fans a read out across accounts:
 
 ```
 google_ads(action="execute", tool_name="google_get_campaign_performance", arguments={"date_range":"last_30_days"}, accounts="all_active")
 ```
 
-- `accounts` takes a list of ids or `"all_active"`. Reads only, at most 20 accounts, one billed task
-  each.
+- `accounts` takes a list of ids or `"all_active"`. Reads only, free, at most 20 accounts.
 - One table per currency. Never sum or average across currencies.
 - Name the accounts included, and say which were skipped and why.
 - Check `get_usage_status` first on a small plan.

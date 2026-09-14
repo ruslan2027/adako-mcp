@@ -98,6 +98,15 @@ Then wait for a yes.
 Each of these builds the whole stack in one change: container, campaign, upload, creative, ad. All
 PAUSED. Say the task cost before an expensive one.
 
+Every create goes through the platform's `_write` router:
+
+```
+meta_ads_write(action="execute", tool_name="meta_create_image_campaign", arguments={...})
+```
+
+The resolvers and checks in steps 3 and 4 go through the read router (`meta_ads` and so on). Never
+send a lookup to a `_write` router.
+
 To extend something that already exists rather than start over: `meta_add_ad_set`, `meta_add_ad`,
 `tiktok_add_ad_group`, `tiktok_add_ad`, `chatgpt_create_ad_group`, `chatgpt_create_ad`,
 `linkedin_add_creative`, `google_create_responsive_search_ad`.

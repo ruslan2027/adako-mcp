@@ -8,16 +8,23 @@ license: MIT
 
 Adako is an MCP server and REST API that connects Claude, ChatGPT, Cursor and other assistants to
 Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. This skill covers Google Ads: 70
-tools behind the `google_ads` router.
+tools behind two routers, `google_ads` for reads and `google_ads_write` for changes.
 
-Call every one of them as:
+Call them as:
 
 ```
 google_ads(action="execute", tool_name="google_list_campaigns", arguments={"customer_id":"1234567890"})
+google_ads_write(action="execute", tool_name="google_pause_campaign", arguments={...})
 ```
 
-`google_get_campaign_performance` is the exception: it is callable by name. `list_tools` on the
-router is free if you want the full list.
+Everything under Create, Change, Pause and resume, Assets and extensions and Labels below is a
+change, and so are the add and remove tools under Performance Max signals. Those go through
+`google_ads_write`, and each one becomes a proposal the user approves. Everything else goes through
+`google_ads`.
+
+`google_get_campaign_performance` is the exception: it is callable by name. `list_tools` and
+`get_tool_schema` on `google_ads` are free and cover every Google tool, changes included. Never look
+anything up through `google_ads_write`.
 
 ## Account contract
 

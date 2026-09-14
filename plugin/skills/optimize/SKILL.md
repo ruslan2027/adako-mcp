@@ -11,7 +11,9 @@ Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. This skill is wh
 review: which change to propose, how big, and in what order.
 
 Every change here is a write, so every one becomes a proposal the user approves. Nothing moves on
-its own.
+its own. Changes run through the platform's `_write` router (`google_ads_write`, `meta_ads_write`,
+`tiktok_ads_write`, `linkedin_ads_write`, `chatgpt_ads_write`); the diagnosis tools stay on the read
+router (`google_ads` and so on).
 
 ## The order
 

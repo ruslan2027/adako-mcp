@@ -27,12 +27,23 @@ instead of guessing at a cause. If the data does not support a claim, leave the 
 
 ## Finding tools
 
-Your tool list holds a few tools callable by name plus one router per platform. Everything else is
-reached as `router(action="execute", tool_name="…", arguments={...})` on `google_ads`, `meta_ads`,
-`chatgpt_ads`, `tiktok_ads`, `linkedin_ads`, `monitoring` or `diagnostics`.
+Your tool list holds a few tools callable by name plus routers. Everything else is reached through
+a router, and reads and changes use different ones.
+
+- Reads: `google_ads`, `meta_ads`, `chatgpt_ads`, `tiktok_ads`, `linkedin_ads`, `monitoring` or
+  `diagnostics`, as `google_ads(action="execute", tool_name="google_list_campaigns", arguments={...})`.
+  These also list every tool and return any schema, changes included.
+- Changes: `google_ads_write`, `meta_ads_write`, `chatgpt_ads_write`, `tiktok_ads_write`,
+  `linkedin_ads_write` or `monitoring_write`, as
+  `google_ads_write(action="execute", tool_name="google_pause_campaign", arguments={...})`. They
+  only execute, one account at a time.
+
+A change sent to a read router runs nothing and returns the exact `_write` call; a read sent to a
+`_write` router points back. Use the call you are given.
 
 When the right tool is not obvious, call `search_tools` with the user's own words, then
-`get_tool_schema` for the arguments. Both are free. Never guess a tool name.
+`get_tool_schema` for the arguments. Both are free and return the exact call line. Never guess a
+tool name.
 
 ## Arguments
 

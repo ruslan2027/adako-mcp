@@ -8,13 +8,17 @@ license: MIT
 
 Adako is an MCP server and REST API that connects Claude, ChatGPT, Cursor and other assistants to
 Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. This skill covers TikTok Ads: 30
-tools behind the `tiktok_ads` router.
+tools behind two routers, `tiktok_ads` for reads and `tiktok_ads_write` for changes.
 
 ```
 tiktok_ads(action="execute", tool_name="tiktok_list_campaigns", arguments={"advertiser_id":"700000000000000"})
+tiktok_ads_write(action="execute", tool_name="tiktok_pause_campaign", arguments={...})
 ```
 
-`tiktok_get_campaign_performance` is callable by name. Everything else goes through the router.
+`tiktok_get_campaign_performance` is callable by name. The Create, Change and Pause and resume tools
+below, and `tiktok_upload_images`, go through `tiktok_ads_write`, and each one becomes a proposal the
+user approves. Everything else goes through `tiktok_ads`, where `list_tools` and `get_tool_schema`
+are free for every TikTok tool, changes included. Never look anything up through `tiktok_ads_write`.
 
 TikTok appears on the Connections page only where the deployment has TikTok credentials. If the user
 does not see it, say it is available on request and write to support rather than promising a date.

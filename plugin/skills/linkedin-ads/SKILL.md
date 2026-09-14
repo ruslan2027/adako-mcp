@@ -8,13 +8,18 @@ license: MIT
 
 Adako is an MCP server and REST API that connects Claude, ChatGPT, Cursor and other assistants to
 Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. This skill covers LinkedIn Ads: 34
-tools behind the `linkedin_ads` router.
+tools behind two routers, `linkedin_ads` for reads and `linkedin_ads_write` for changes.
 
 ```
 linkedin_ads(action="execute", tool_name="linkedin_list_campaigns", arguments={"ad_account_id":"512345678"})
+linkedin_ads_write(action="execute", tool_name="linkedin_pause_campaign", arguments={...})
 ```
 
-`linkedin_get_campaign_performance` is callable by name. Everything else goes through the router.
+`linkedin_get_campaign_performance` is callable by name. The Create, Change and Pause and resume
+tools below, and `linkedin_delete_creative`, go through `linkedin_ads_write`, and each one becomes a
+proposal the user approves. Everything else goes through `linkedin_ads`, where `list_tools` and
+`get_tool_schema` are free for every LinkedIn tool, changes included. Never look anything up through
+`linkedin_ads_write`.
 
 LinkedIn appears on the Connections page only where the deployment has LinkedIn credentials. If the
 user does not see it, say it is available on request.
