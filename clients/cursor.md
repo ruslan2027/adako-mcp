@@ -4,6 +4,10 @@ Adako is an MCP server and REST API that connects Claude, ChatGPT, Cursor and ot
 Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. Cursor reads MCP servers from a JSON
 file.
 
+This repository is also packaged as a Cursor plugin for the Cursor Marketplace:
+[`.cursor-plugin/plugin.json`](../.cursor-plugin/plugin.json) adds the server and the skills in
+[`skills/`](../skills).
+
 ## Option A — the installer
 
 ```bash

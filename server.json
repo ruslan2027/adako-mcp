@@ -1,9 +1,9 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "ai.adako/ads",
-  "title": "Adako — careful ad ops for AI agents",
-  "description": "Google, Meta, ChatGPT, TikTok and LinkedIn Ads for AI agents. Every write needs your approval.",
-  "version": "0.2.0",
+  "title": "Adako: ad ops for AI assistants",
+  "description": "Google, Meta, ChatGPT, TikTok and LinkedIn Ads for AI assistants. Every change needs your approval.",
+  "version": "0.2.1",
   "websiteUrl": "https://adako.ai/docs",
   "repository": {
     "url": "https://github.com/ruslan2027/adako-mcp",

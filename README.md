@@ -1,4 +1,4 @@
-# Adako — careful ad ops for AI agents
+# Adako: ad ops for AI assistants
 
 **アダコ** · [adako.ai](https://adako.ai)
 
@@ -159,6 +159,10 @@ Or write the file yourself:
 Full file: [`clients/cursor/mcp.json`](clients/cursor/mcp.json). Guide:
 [`clients/cursor.md`](clients/cursor.md).
 
+This repository is also a Cursor plugin, for the Cursor Marketplace:
+[`.cursor-plugin/plugin.json`](.cursor-plugin/plugin.json) adds the server and the skills in
+[`skills/`](skills).
+
 ### Codex CLI
 
 ```bash
@@ -201,7 +205,16 @@ format, but Adako has not been verified in Windsurf yet.
 
 ### Gemini CLI
 
-`~/.gemini/settings.json`:
+Install the extension from this repository. It adds the server and loads the Adako skill as
+[`GEMINI.md`](GEMINI.md):
+
+```bash
+gemini extensions install https://github.com/ruslan2027/adako-mcp
+```
+
+Then run `/mcp auth adako` inside Gemini CLI to sign in through the browser.
+
+Without a browser, add the server with an API key to `~/.gemini/settings.json` instead:
 
 ```json
 {
@@ -216,7 +229,8 @@ format, but Adako has not been verified in Windsurf yet.
 }
 ```
 
-An extension manifest is in [`clients/gemini-cli/gemini-extension.json`](clients/gemini-cli/gemini-extension.json).
+Manifests: [`gemini-extension.json`](gemini-extension.json) (browser sign-in) and
+[`clients/gemini-cli/gemini-extension.json`](clients/gemini-cli/gemini-extension.json) (API key).
 Guide: [`clients/gemini-cli.md`](clients/gemini-cli.md). **Untested** — the extension packaging has
 not been run end to end against Adako yet.
 

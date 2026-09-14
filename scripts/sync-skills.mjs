@@ -9,6 +9,8 @@
  *   public-repo/skills/<name>/        what people copy into ~/.claude/skills or upload to claude.ai
  *   public-repo/plugin/skills/<name>/ the copy the Claude Code plugin ships
  *   public-repo/SKILL.md              the root skill, for clients that take a single file
+ *   public-repo/GEMINI.md             the root skill without frontmatter, the Gemini CLI extension's
+ *                                     context file (gemini-extension.json → contextFileName)
  *
  * Zero dependencies. Node 22+.
  *
@@ -86,9 +88,13 @@ export async function syncSkills() {
     written.push(`${relative(publicRepo, target).replace(/\\/g, '/')}/ (${names.length} skills)`)
   }
 
-  const root = join(publicRepo, 'SKILL.md')
-  await writeFile(root, await readFile(join(source, ROOT_SKILL, 'SKILL.md')))
+  const rootSkill = await readFile(join(source, ROOT_SKILL, 'SKILL.md'), 'utf8')
+  await writeFile(join(publicRepo, 'SKILL.md'), rootSkill)
   written.push('SKILL.md')
+
+  // Gemini CLI loads GEMINI.md as plain context, so the skill frontmatter stays out of it.
+  await writeFile(join(publicRepo, 'GEMINI.md'), rootSkill.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n+/, ''))
+  written.push('GEMINI.md')
 
   return { names, written }
 }

@@ -10,8 +10,8 @@
       "name": "adako",
       "source": "./plugin",
       "displayName": "Adako",
-      "description": "Careful ad ops for Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. Reads run instantly; every write becomes a proposal you approve. Created campaigns are paused.",
-      "version": "0.2.0",
+      "description": "Ad ops for Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads from your AI assistant. Reads run instantly; every write becomes a proposal you approve. Created campaigns are paused.",
+      "version": "0.2.1",
       "author": {
         "name": "Adako",
         "email": "support@adako.ai",
@@ -32,6 +32,6 @@
     }
   ],
   "metadata": {
-    "description": "Adako: careful ad ops for AI agents. Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads through one MCP server; every write becomes a proposal you approve."
+    "description": "Adako: ad ops for AI assistants. Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads through one MCP server; every write becomes a proposal you approve."
   }
 }

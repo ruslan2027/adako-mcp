@@ -4,6 +4,17 @@ Adako is an MCP server and REST API that connects Claude, ChatGPT, Cursor and ot
 Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. This file tracks what changed in the
 service and in this repository.
 
+## 0.2.1
+
+- **Gemini CLI extension** at the root of this repository:
+  `gemini extensions install https://github.com/ruslan2027/adako-mcp`. It adds the server with
+  browser sign-in and loads the Adako skill as `GEMINI.md`.
+- **Cursor plugin** manifest, `.cursor-plugin/plugin.json`: the server plus the skills.
+- Every tool that changes something, in an ad account or in Adako, now carries
+  `destructiveHint: true`, creates included. Routers that can only read are marked read-only.
+- In ChatGPT, plan and quota messages link the plans page (`plans_url`) instead of an upgrade link.
+- New listing title: "Adako: ad ops for AI assistants".
+
 ## 0.2.0
 
 Three new ad platforms, a tool surface that scales, a REST API, and daily watching.

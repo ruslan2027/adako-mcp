@@ -1,13 +1,10 @@
 {
-  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "adako",
-  "displayName": "Adako",
+  "description": "Ad ops for Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads from Cursor. Reads run instantly; every write becomes a proposal you approve. Created campaigns are paused.",
   "version": "0.2.1",
-  "description": "Ad ops for Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads from your AI assistant. Reads run instantly; every write becomes a proposal you approve. Created campaigns are paused.",
   "author": {
     "name": "Adako",
-    "email": "support@adako.ai",
-    "url": "https://adako.ai"
+    "email": "support@adako.ai"
   },
   "homepage": "https://adako.ai/docs",
   "repository": "https://github.com/ruslan2027/adako-mcp",
@@ -23,9 +20,10 @@
     "marketing",
     "ad-ops"
   ],
+  "logo": "assets/logo.png",
+  "skills": "skills/",
   "mcpServers": {
     "adako": {
-      "type": "http",
       "url": "https://adako.ai/mcp"
     }
   }
