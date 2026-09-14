@@ -23,13 +23,13 @@ tools marked **direct** below. Everything else goes through a router, as
 
 ### System (5)
 
-| Tool                      | Risk | Cost | When to use                                                                                                                                                     |
-| ------------------------- | ---- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `start_here`              | R    | 0    | Call this first in a new conversation, or whenever you are unsure what the user can do.                                                                         |
-| `get_connections_status`  | R    | 0    | Shows every platform login the user has connected, its token health (active / needs re-authorisation / revoked), and the active + primary ad accounts under it. |
-| `list_connected_accounts` | R    | 0    | Lists every ad account Adako knows for this user, with platform id, name, currency, timezone, and whether it is active and primary.                             |
-| `switch_primary_account`  | W    | 0    | Makes one account the primary account for its platform, the one later tools use when no account id is passed, and switches it on if it was inactive.            |
-| `get_usage_status`        | R    | 0    | Returns the user's plan, tasks used vs limit for the current period, when it resets, active ad accounts vs the plan limit, and the upgrade link.                |
+| Tool                      | Risk | Cost | When to use                                                                                                                                                        |
+| ------------------------- | ---- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `start_here`              | R    | 0    | Call this first in a new conversation, or whenever you are unsure what the user can do.                                                                            |
+| `get_connections_status`  | R    | 0    | Shows every platform login the user has connected, its token health (active / needs re-authorisation / revoked), and the active + primary ad accounts under it.    |
+| `list_connected_accounts` | R    | 0    | Lists every ad account Adako knows for this user, with platform id, name, currency, timezone, and whether it is active and primary.                                |
+| `switch_primary_account`  | W    | 0    | Makes one account the primary account for its platform, the one later tools use when no account id is passed, and switches it on if it was inactive.               |
+| `get_usage_status`        | R    | 0    | Returns the user's plan, tasks used vs limit for the current period, when it resets, ad accounts used this billing period vs the plan limit, and the upgrade link. |
 
 ### Diagnostics (8)
 

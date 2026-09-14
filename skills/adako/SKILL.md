@@ -463,8 +463,9 @@ Every error carries a `code`, a `message` and `recovery_steps`. Follow the steps
 - `account_ambiguous`: ask which account. `platform_rate_limited`: wait, and say so.
 - `not_connected` that lists inactive accounts: the platform is connected but nothing on it is on.
   Ask which account to use, then `switch_primary_account`.
-- `account_limit`: the plan's active ad accounts are all in use. Point to Connections or the upgrade
-  link. Do not switch accounts off on the user's behalf.
+- `account_limit`: every ad account the plan covers this billing period is taken, and an account used
+  in the period keeps its place after it is switched off. Give the upgrade link and the reset date. Do
+  not switch accounts off on the user's behalf.
 - Anything unfamiliar from a platform: paste it into `explain_error` rather than interpreting it.
 - After several failures in a session, `why_did_this_fail` reads the real call log and explains each
   one with the fix.

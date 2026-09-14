@@ -361,8 +361,9 @@ Every one of those ends with a proposal you approve or reject.
 
 ## Pricing
 
-Free includes 1 active ad account and 30 tasks a month. Pro ($49/month) covers 5 active accounts and
-600 tasks, Agency ($149/month) 20 accounts and 5,000 tasks, and Enterprise is priced per contract. A
+Free includes 1 ad account and 30 tasks a month. Pro ($49/month) covers 5 ad accounts and 600 tasks a
+month, Agency ($149/month) 20 accounts and 5,000 tasks, and Enterprise is priced per contract. An
+account used in a billing period keeps its place until the period resets. A
 task is one billed change to an ad account; reads and connection, usage, proposal, discovery,
 diagnostic and resolver tools are free. Monitors, scheduled briefs and generated reports need Pro or above. Details at
 [adako.ai/pricing](https://adako.ai/pricing).
