@@ -35,14 +35,14 @@ side rather than guessing at a cause. If the data does not support a claim, leav
 
 ### Routers
 
-Your tool list holds 28 entries: 15 tools callable by name and 13 routers. The other 216 tools are
+Your tool list holds 29 entries: 16 tools callable by name and 13 routers. The other 217 tools are
 reached through a router.
 
 Directly callable: `start_here`, `get_connections_status`, `list_connected_accounts`,
-`switch_primary_account`, `get_usage_status`, `list_pending_proposals`, `approve_proposal`,
-`reject_proposal`, `search_tools`, `get_tool_schema`, `google_get_campaign_performance`,
-`meta_get_campaign_performance`, `chatgpt_get_performance`, `tiktok_get_campaign_performance`,
-`linkedin_get_campaign_performance`.
+`switch_primary_account`, `get_usage_status`, `check_media`, `list_pending_proposals`,
+`approve_proposal`, `reject_proposal`, `search_tools`, `get_tool_schema`,
+`google_get_campaign_performance`, `meta_get_campaign_performance`, `chatgpt_get_performance`,
+`tiktok_get_campaign_performance`, `linkedin_get_campaign_performance`.
 
 Routers come in pairs: a read router for reads and lookups, and a `_write` router for changes.
 
@@ -164,14 +164,14 @@ manual alternative: run the review yourself when the user asks.
 
 ## 4. Tool map
 
-231 tools. Names only here; `references/tool-cheatsheet.md` has one line each with risk, cost and
+233 tools. Names only here; `references/tool-cheatsheet.md` has one line each with risk, cost and
 when to use, and `get_tool_schema` has the arguments. Routed tools marked W or D there run through
 the `_write` router; the rest run through the read router.
 
-### Adako itself (31)
+### Adako itself (32)
 
-**System** (5) `start_here` · `get_connections_status` · `list_connected_accounts` ·
-`switch_primary_account` · `get_usage_status`
+**System** (6) `start_here` · `get_connections_status` · `list_connected_accounts` ·
+`switch_primary_account` · `get_usage_status` · `check_media`
 
 **Discovery** (2) `search_tools` · `get_tool_schema`
 
@@ -229,7 +229,7 @@ the `_write` router; the rest run through the read router.
 **audiences** `google_get_search_themes` · `google_add_search_themes` ·
 `google_remove_search_themes` · `google_add_audience_signal` · `google_search_audiences`
 
-### Meta Ads (43, routers `meta_ads` and `meta_ads_write`, `ad_account_id`)
+### Meta Ads (44, routers `meta_ads` and `meta_ads_write`, `ad_account_id`)
 
 **structure** `meta_list_campaigns` · `meta_list_ad_sets` · `meta_list_ads` · `meta_list_lead_forms` ·
 `meta_get_lead_form_submissions`
@@ -245,7 +245,7 @@ the `_write` router; the rest run through the read router.
 `meta_get_ad_set_targeting` · `meta_browse_targeting`
 
 **assets** `meta_list_pages` · `meta_get_ad_creatives` · `meta_list_instagram_accounts` ·
-`meta_list_promotable_apps`
+`meta_list_promotable_apps` · `meta_list_media`
 
 **conversions** `meta_list_pixels`
 
@@ -490,7 +490,7 @@ Every error carries a `code`, a `message` and `recovery_steps`. Follow the steps
 
 ## 7. Beyond MCP
 
-The same 231 tools run over REST: `POST /api/v1/tools/{tool_name}/execute` with an API key, an
+The same 233 tools run over REST: `POST /api/v1/tools/{tool_name}/execute` with an API key, an
 `Idempotency-Key` header and a JSON envelope. `GET /api/v1/tools` lists them and
 `GET /api/v1/openapi.json` is the machine-readable contract. Routers, read and `_write`, are MCP
 only; over REST the URL is the dispatch. `search_tools` and `get_tool_schema` run over REST as well, and their call lines come

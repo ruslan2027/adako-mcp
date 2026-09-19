@@ -3,7 +3,7 @@
   "name": "ai.adako/ads",
   "title": "Adako: ad ops for AI assistants",
   "description": "Google, Meta, ChatGPT, TikTok and LinkedIn Ads for AI assistants. Every change needs your approval.",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "websiteUrl": "https://adako.ai/docs",
   "repository": {
     "url": "https://github.com/ruslan2027/adako-mcp",

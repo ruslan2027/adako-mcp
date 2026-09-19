@@ -46,4 +46,4 @@ Using Adako, tell me which ad accounts are connected.
 - Reads run immediately. Writes come back as a proposal; nothing changes until you approve it.
 - Created campaigns, ad sets and ads are always paused.
 - `needs_reauth` means the platform login expired. Reconnect at
-  [adako.ai/connections](https://adako.ai/connections).
+  [adako.ai/accounts](https://adako.ai/accounts).

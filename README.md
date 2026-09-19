@@ -20,18 +20,18 @@ installers, a Claude Code plugin, and the MCP Registry entry. The server itself 
 
 ## What it can do
 
-231 tools across five platforms, plus Adako's own.
+233 tools across five platforms, plus Adako's own.
 
 | Platform     | Tools | What they cover                                                                                                                                                                 |
 | ------------ | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Google Ads   | 70    | Search and Performance Max, keywords and search terms, budgets and bid strategies, assets and extensions, conversion actions, labels, schedules, geo, hourly and device reports |
-| Meta Ads     | 43    | Campaigns, ad sets and ads, image, video, carousel and app-install launches, audiences and placements, pixels, lead forms, creative fatigue                                     |
+| Meta Ads     | 44    | Campaigns, ad sets and ads, image, video, carousel and app-install launches, audiences and placements, pixels, lead forms, creative fatigue                                     |
 | LinkedIn Ads | 34    | Campaign groups and campaigns, image, video, carousel and text ads, B2B targeting, audience forecasts, conversion rules, engagement metrics                                     |
 | TikTok Ads   | 30    | Campaigns, ad groups and in-feed video ads, Spark Ads, video metrics, identities, pixels, creative fatigue                                                                      |
 | ChatGPT Ads  | 23    | Chat card campaigns end to end, account limits, pixels, review verdicts                                                                                                         |
-| Adako        | 31    | Connections and usage, tool discovery, proposals, diagnostics, monitors, briefs and reports                                                                                     |
+| Adako        | 32    | Connections and usage, tool discovery, proposals, diagnostics, monitors, briefs and reports                                                                                     |
 
-Your client does not see 231 entries. It sees 15 tools callable by name plus 13 routers. Each
+Your client does not see 233 entries. It sees 16 tools callable by name plus 13 routers. Each
 platform has a read router (`google_ads`, `meta_ads`, `chatgpt_ads`, `tiktok_ads`, `linkedin_ads`)
 and a write router beside it (`google_ads_write`, `meta_ads_write`, `chatgpt_ads_write`,
 `tiktok_ads_write`, `linkedin_ads_write`). Monitors have `monitoring` and `monitoring_write`, and
@@ -45,7 +45,7 @@ reads once. Every change runs through a `_write` tool, which asks each time and 
 free. See [adako.ai/docs/routers](https://adako.ai/docs/routers).
 
 TikTok Ads and LinkedIn Ads are available on request; write to support@adako.ai if you do not see
-them on the Connections page.
+them on the Accounts page.
 
 ---
 
@@ -325,7 +325,7 @@ package is [`@adako/cli` on npm](https://www.npmjs.com/package/@adako/cli).
 ## Connect your accounts
 
 1. Sign in at [adako.ai](https://adako.ai).
-2. Open **Connections** and connect a platform. Google Ads, Meta Ads, TikTok Ads and LinkedIn Ads
+2. Open **Accounts** and connect a platform. Google Ads, Meta Ads, TikTok Ads and LinkedIn Ads
    sign in through the platform; ChatGPT Ads takes an advertiser API key. You never hand a password
    or a token to your AI client.
 3. Turn on the accounts Adako may work on, and pick the primary for each platform.

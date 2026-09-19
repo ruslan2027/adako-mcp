@@ -21,7 +21,7 @@ proposal the user approves. Everything else goes through `linkedin_ads`, where `
 `get_tool_schema` are free for every LinkedIn tool, changes included. Never look anything up through
 `linkedin_ads_write`.
 
-LinkedIn appears on the Connections page only where the deployment has LinkedIn credentials. If the
+LinkedIn appears on the Accounts page only where the deployment has LinkedIn credentials. If the
 user does not see it, say it is available on request.
 
 ## Account contract
@@ -71,11 +71,20 @@ user does not see it, say it is available on request.
 3. **Targeting facets are URNs.** `linkedin_search_targeting` turns titles, industries, seniorities,
    company sizes, locations, skills, interests, employers, degrees and locales into the URNs a write
    accepts. A job title typed as text is a hard error.
-4. **Budget floor is about 10 a day** per campaign, and the same for a lifetime budget divided across
-   its days. LinkedIn is the most expensive of the five platforms per click; 10 a day buys very
-   little. Say so.
+4. **Budget floor is about 10 a day** per campaign in USD, EUR or GBP; other currencies have their own
+   minimum, which the preview reads from LinkedIn. LinkedIn is the most expensive of the five
+   platforms per click; 10 a day buys very little. Say so.
 5. **Objectives decide formats.** `linkedin_explain_objectives` says what each objective optimises
-   for, which formats and cost types it allows, and whether it needs a conversion rule at all.
+   for, which formats and cost types it allows, and whether it needs a conversion rule at all. Lead
+   generation is refused (lead forms are built in Campaign Manager), the Audience Network is refused
+   for text ads and where the objective disallows it, and the preview says so before anything exists.
+6. **Bidding is explicit.** Without `bid`, the campaign uses LinkedIn's automated bidding for the
+   objective, billed per impression. With `bid`, it is a manual bid on `cost_type`. Text ads need a
+   bid.
+7. **Language is not a country.** `language` is the LinkedIn interface language, one locale per
+   language; where the ads run is `targeting.locations`. `country` only picks Traditional Chinese.
+8. **Groups.** A campaign group name is at most 200 UTF-8 bytes, and a group total budget needs an
+   end date.
 
 ## Asset and copy limits
 
@@ -101,7 +110,8 @@ user does not see it, say it is available on request.
 4. `linkedin_validate_assets` on the image URL.
 5. `validate_campaign_draft` on the `diagnostics` router for a full dry run.
 6. `linkedin_create_image_campaign`. It reuses a campaign group or creates one, then the campaign,
-   the image upload, the dark post authored by the page, and the creative. Everything PAUSED.
+   the image upload, the dark post authored by the page, and the creative. The campaign starts
+   PAUSED and holds the rest back: LinkedIn creates groups and creatives only ACTIVE or DRAFT.
 7. Read back, then wire up measurement: `linkedin_list_conversions` and
    `linkedin_associate_conversion` so leads report against that campaign's spend.
 

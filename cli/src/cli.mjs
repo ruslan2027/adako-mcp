@@ -232,12 +232,23 @@ async function runTool(tool, args, options, baseUrl, apiKey, out, err) {
 
   if (response.replayed) err('(replayed from the idempotency cache — nothing ran again)')
   out(String(body.markdown ?? ''))
-  if (typeof body.proposal_id === 'string') {
-    err(`\nProposal ${body.proposal_id} is waiting. Nothing has changed yet.`)
-    if (typeof body.approve_url === 'string') err(`Approve: ${body.approve_url}`)
-    err(`Or: adako run approve_proposal --arg proposal_id=${body.proposal_id}`)
-  }
+  for (const line of proposalFooter(body)) err(line)
   return 0
+}
+
+/**
+ * The "how to approve" footer, only while a proposal is still waiting. An approved or executed write
+ * carries `proposal_id` too, so the id alone does not mean anything is pending: `data.status` does.
+ * @param {Record<string, any>} body a success envelope
+ * @returns {string[]}
+ */
+export function proposalFooter(body) {
+  if (typeof body.proposal_id !== 'string' || body.data?.status !== 'pending') return []
+  return [
+    `\nProposal ${body.proposal_id} is waiting. Nothing has changed yet.`,
+    ...(typeof body.approve_url === 'string' ? [`Approve: ${body.approve_url}`] : []),
+    `Or: adako run approve_proposal --arg proposal_id=${body.proposal_id}`,
+  ]
 }
 
 /**

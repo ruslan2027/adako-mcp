@@ -38,7 +38,7 @@ Start here.
 
 Claude calls `start_here` and reports your connections, primary accounts, currency and remaining
 tasks. If nothing is connected, connect Google Ads or Meta Ads at
-[adako.ai/connections](https://adako.ai/connections) and ask again.
+[adako.ai/accounts](https://adako.ai/accounts) and ask again.
 
 ## What to expect
 
@@ -57,5 +57,5 @@ tasks. If nothing is connected, connect Google Ads or Meta Ads at
 | ---------------------------------- | ------------------------------------------------------------------------------------------------- |
 | The connector will not connect     | Check you are signed in to Adako in the same browser, then retry **Connect**.                     |
 | No Adako tools in the conversation | Open the connector list in the chat composer and switch Adako on for that conversation.           |
-| `needs_reauth`                     | That platform's login expired. Reconnect at [adako.ai/connections](https://adako.ai/connections). |
+| `needs_reauth`                     | That platform's login expired. Reconnect at [adako.ai/accounts](https://adako.ai/accounts). |
 | `quota_exceeded`                   | The month's tasks are used up. See [adako.ai/pricing](https://adako.ai/pricing).                  |

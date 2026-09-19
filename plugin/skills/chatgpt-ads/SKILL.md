@@ -53,7 +53,9 @@ user asks for archiving by name and understands it cannot be undone.
 ## What the platform sells
 
 - Objectives: `reach`, `clicks`, `conversions`.
-- The platform bids towards impressions, clicks or conversions.
+- The platform bids towards impressions, clicks or conversions. There is no automatic bidding: every ad
+  group needs a maximum bid, as a CPM (per 1,000 impressions) for `reach`, per click for `clicks`
+  and a target cost per conversion for `conversions`. Ask the user for it; do not invent one.
 - Billing is on impressions or clicks.
 - `chatgpt_get_account_limits` returns the live list for that account, plus its currency, timezone
   and review state. Read it before proposing an objective; do not assume from memory.
@@ -69,7 +71,7 @@ One ad format. Limits, enforced before anything is created:
 | Destination URL                | https, up to 2048 characters                                   |
 | Image                          | square, at least 400 px a side, under 10 MB, jpeg, png or webp |
 | Campaign, ad group and ad name | 3 to 1000 characters                                           |
-| Context hints                  | up to 20, each up to 100 characters                            |
+| Context hints                  | up to 20, each up to 200 characters                            |
 
 `chatgpt_validate_chat_card` checks all of it against a real fetch of the image URL. Run it before
 proposing the launch; a card that fails review costs a review cycle.
@@ -88,7 +90,8 @@ belong to the ad group.
 4. `chatgpt_validate_chat_card` on the copy and image.
 5. `validate_campaign_draft` on the `diagnostics` router for a full dry run
    (`platform: "chatgpt_ads"`, `campaign_type: "chat_card"`).
-6. `chatgpt_launch_ad` builds campaign, ad group, image upload and one chat card ad, all PAUSED. It
+6. `chatgpt_launch_ad` uploads the image first, then builds campaign, ad group and one chat card ad,
+   all PAUSED, so a rejected image leaves nothing behind. Dates are days in the account time zone. It
    costs 8 tasks, so say so before calling it.
 7. Read back the ids and the review verdict. Approval is not instant; `chatgpt_list_ads` reports the
    verdict and the reason when it arrives.

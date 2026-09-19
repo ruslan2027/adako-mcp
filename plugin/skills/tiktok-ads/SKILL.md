@@ -20,7 +20,7 @@ below, and `tiktok_upload_images`, go through `tiktok_ads_write`, and each one b
 user approves. Everything else goes through `tiktok_ads`, where `list_tools` and `get_tool_schema`
 are free for every TikTok tool, changes included. Never look anything up through `tiktok_ads_write`.
 
-TikTok appears on the Connections page only where the deployment has TikTok credentials. If the user
+TikTok appears on the Accounts page only where the deployment has TikTok credentials. If the user
 does not see it, say it is available on request and write to support rather than promising a date.
 
 ## Account contract
@@ -55,20 +55,22 @@ No TikTok tool deletes anything.
 
 ## The objective matrix
 
-The objective decides which optimisation goals and pixel events are legal. An invalid pair is
-rejected after the campaign row already exists, so settle it first with `tiktok_explain_objective`,
-or read the whole rule set with `get_campaign_spec` (`platform: "tiktok_ads"`,
-`campaign_type: "video"`).
+The objective decides which optimisation goals and pixel events are legal. The create tool's
+preview refuses an invalid pair before anything exists; settle it first with
+`tiktok_explain_objective`, or read the whole rule set with `get_campaign_spec`
+(`platform: "tiktok_ads"`, `campaign_type: "video"`).
 
-| Objective       | Optimises for                   | Pixel                                   |
-| --------------- | ------------------------------- | --------------------------------------- |
-| REACH           | reach, billed on impressions    | no                                      |
-| TRAFFIC         | clicks, landing page views      | optional                                |
-| VIDEO_VIEWS     | video views, engaged views      | no                                      |
-| ENGAGEMENT      | engagement, followers           | no                                      |
-| LEAD_GENERATION | instant forms, or website leads | only for website leads                  |
-| WEB_CONVERSIONS | conversions, value              | required, with an event the pixel fires |
-| APP_PROMOTION   | installs, in-app events         | required                                |
+| Objective       | Optimises for                                        | Pixel                                   |
+| --------------- | ---------------------------------------------------- | --------------------------------------- |
+| REACH           | reach, billed on impressions                         | no                                      |
+| TRAFFIC         | clicks, landing page views                           | optional                                |
+| VIDEO_VIEWS     | engaged views (6 s or 15 s), billed per view         | no                                      |
+| ENGAGEMENT      | followers, or profile page visits                    | no                                      |
+| WEB_CONVERSIONS | conversions, value                                   | required, with an event the pixel fires |
+
+Adako builds these five. Lead generation, app promotion and product sales need assets set up in
+TikTok first, and the create tool refuses them. `VIDEO_VIEW` and `PROFILE_VISIT` are retired goals;
+Adako maps them to `ENGAGED_VIEW` and `PAGE_VISIT` and says so.
 
 VIDEO_VIEWS is the cheapest way to buy views and the worst proxy for intent. Say that when a user
 asks for views and means sales.
@@ -78,17 +80,27 @@ asks for views and means sales.
 - In-feed video: 9:16 preferred at 1080x1920, also 1:1 and 16:9; 5 to 60 seconds; minimum 540x960;
   under 500 MB; mp4, mov, mpeg, avi or 3gp. Best-performing length is roughly 21 to 34 seconds.
 - Safe zone: keep text and logos out of the top 13% and bottom 20%, where the interface sits.
-- Cover image: optional, 9:16. TikTok picks a frame when you omit one. `tiktok_upload_images` puts
-  covers in the library and returns image ids.
-- Ad text: 100 characters. Display name: 20. Call to action: 30.
+- Cover image: required for every video ad that is not a Spark Ad from an organic post; exactly one.
+  `tiktok_upload_images` puts covers in the library and returns image ids.
+- Identity: required on every ad. Custom identities (`CUSTOMIZED_USER`) can no longer post on TikTok
+  placements; a Business Center identity needs its Business Center id.
+- Ad text: 100 characters, no emoji; each Chinese or Japanese character counts as two. Display name:
+  20. Call to action: 30.
 - `tiktok_validate_assets` checks a URL is reachable, an accepted format and inside the size limit
   before anything is uploaded. Run it first; an upload failure is expensive to unpick.
 
 ## Budget floors
 
-About 20 a day per ad group, and higher at campaign level (commonly about 50). Floors are enforced at
-creation, not at edit time, so state them before proposing a budget. Non-USD accounts have the
-equivalent.
+In USD, 20 a day per ad group and 50 a day per campaign. Other currencies multiply those by TikTok's
+currency ratio (JPY 5,000 and 2,000, for example), and some take whole amounts only. The preview
+checks the account's own floor, and a budget lowered later must stay at least 105% of what has
+already been spent. A bid must be below both the ad group and the campaign budget.
+
+## Dates
+
+Start and end dates are days in the advertiser's time zone; Adako converts them to the UTC times
+TikTok takes. A start date that is already over is refused. The schedule lives on the ad group:
+change it with `tiktok_update_ad_group`, not the campaign.
 
 ## Launching a video campaign
 
@@ -98,8 +110,9 @@ equivalent.
    used.
 3. `tiktok_list_pixels` when the objective needs one, and check the chosen event has recent traffic.
    An event with no volume never leaves learning.
-4. `tiktok_search_targeting` for places, interest categories, interest keywords and languages. Device
-   and network values come back as enums to use verbatim.
+4. `tiktok_search_targeting` for places, interest categories, interest keywords and languages. Pass
+   the campaign objective, because the places TikTok allows depend on it. Device and network values
+   come back as enums to use verbatim.
 5. `tiktok_validate_assets` on the video URL.
 6. `validate_campaign_draft` on the `diagnostics` router for a full dry run.
 7. `tiktok_create_video_campaign` from a video URL, an existing video id, or an organic post for a

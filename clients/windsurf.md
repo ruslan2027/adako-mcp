@@ -79,7 +79,7 @@ Using Adako, tell me which ad accounts are connected.
 
 `start_here` is free and instant. It reports what is connected, which account is primary, its
 currency and timezone, and how many tasks remain. If nothing is connected yet, it hands you the link
-to [adako.ai/connections](https://adako.ai/connections).
+to [adako.ai/accounts](https://adako.ai/accounts).
 
 ## Notes
 
@@ -87,4 +87,4 @@ to [adako.ai/connections](https://adako.ai/connections).
   the ad platform until you approve it.
 - Created campaigns, ad sets and ads are always paused.
 - If a tool returns `needs_reauth`, the platform login expired. Reconnect at
-  [adako.ai/connections](https://adako.ai/connections); no restart needed.
+  [adako.ai/accounts](https://adako.ai/accounts); no restart needed.

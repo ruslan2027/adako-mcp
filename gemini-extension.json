@@ -1,6 +1,6 @@
 {
   "name": "adako",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Ad ops for Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads from Gemini CLI. Reads run instantly; every write becomes a proposal you approve.",
   "mcpServers": {
     "adako": {

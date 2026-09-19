@@ -77,7 +77,7 @@ On failure the exit code is non-zero and stderr carries the error code and what 
 
 ```
 Error (not_connected): Google Ads is not connected.
-  - Ask the user to connect Google Ads at https://adako.ai/connections.
+  - Ask the user to connect Google Ads at https://adako.ai/accounts.
 ```
 
 Exit codes: `0` success, `1` the call failed, `2` the command line was wrong.
@@ -93,7 +93,8 @@ Approve: https://adako.ai/approvals/prp_01J…
 Or: adako run approve_proposal --arg proposal_id=prp_01J…
 ```
 
-Approving needs a key with `ads:write`. Created campaigns are always paused. There are no delete
+That footer appears only while the proposal is waiting; approving it prints the applied change and
+its read-back instead. Approving needs a key with `ads:write`. Created campaigns are always paused. There are no delete
 commands; removing negative keywords needs `--confirm-delete`.
 
 ## Retries

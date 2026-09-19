@@ -85,14 +85,23 @@ Order matters, and each step is its own call so nothing is guessed.
 
 1. `google_research_keywords` when the user has no list. Needs Basic access on the developer token;
    without it the tool says `access_level_insufficient` instead of inventing volumes.
-2. `google_resolve_locations` for every place name. Ambiguity returns candidates; ask.
+2. `google_resolve_locations` for every place name (pass the country code). Only an exact name
+   resolves; partial matches come back as candidates. Ask. Locations reach people in those places
+   unless `location_targeting` is `PRESENCE_OR_INTEREST`. `google_list_languages` for language ids;
+   leaving languages out targets every language.
 3. `google_validate_ad_copy` on the headlines and descriptions. Limits: 3 to 15 headlines of 30
-   characters, 2 to 4 descriptions of 90, two paths of 15, keyword text up to 80.
+   characters, 2 to 4 descriptions of 90, two paths of 15, keyword text up to 80. Chinese, Japanese
+   and Korean characters count as two.
 4. `validate_campaign_draft` (`diagnostics` router) for a full dry run against the spec.
 5. `google_create_search_campaign`. One atomic mutate: budget, campaign PAUSED, location and
    language criteria, ad groups, keywords, one responsive search ad per ad group, optional campaign
    negatives.
 6. Read the result back and say what is paused. Then offer extensions as a separate proposal.
+
+Budgets, bids and target CPA are rounded to the currency's billable unit (whole yen or won, for
+example), and the preview says when rounding changed a number. Start and end dates are days in the
+account time zone and cannot be in the past. Structured snippet headers take the ad language
+(`language`), because Google only accepts its own translated header for each locale.
 
 Rules that cause most rejections: fewer than 3 headlines or 2 descriptions, ALL-CAPS words, more than
 one exclamation mark per ad and none in a headline, and broad match with no negative list.

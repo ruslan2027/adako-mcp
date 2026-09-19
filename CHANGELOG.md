@@ -4,6 +4,36 @@ Adako is an MCP server and REST API that connects Claude, ChatGPT, Cursor and ot
 Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. This file tracks what changed in the
 service and in this repository.
 
+## 0.3.1
+
+- **Two new tools.** `check_media` checks an image or video before an ad is built from it: it
+  repairs the share links that do not serve files, reads the real file, judges it against each
+  platform's rules, and, called with no arguments, says where to put a file that has no link yet.
+  `meta_list_media` lists the images and videos already in a Meta ad account, with the hash or id to
+  reuse, so nothing is uploaded twice. 233 tools now, reached through 29 entries: 16 callable by
+  name and 13 routers.
+- **The tool list is a quarter smaller.** Router descriptions carried a title beside every tool name
+  and repeated the same protocol paragraph thirteen times. Platform routers now list tool names
+  grouped by category, and the protocol is in the server instructions, which are sent once.
+  `action="list_tools"` still returns every title with its risk and cost, free. Nothing was removed:
+  the same tools, arguments, enum values and card addresses.
+- **Clients are told they may cache the tool list**: `ttlMs` and `cacheScope` (SEP-2549) now go out
+  with the cacheable results — one hour, public.
+- **`explain_error` understands what the platforms actually say.** Ten rules from real refusals: a
+  Meta account with no payment method, a bid the inherited strategy requires, a flexible ad in a
+  non-dynamic ad set, a frequency cap set after the ad set started, and on LinkedIn the renamed
+  levels, the status a new group or creative may not have, a run schedule that starts in the past,
+  targeting LinkedIn refuses and a creative with no landing page.
+- **ChatGPT Ads**: campaign, ad group and ad lists no longer break on an account with a serving
+  issue; read-backs wait for a change to show instead of reporting the state before it; bids and geo
+  changes work on ad groups again.
+- **Meta**: creating a campaign, an ad set or an ad no longer fails halfway. Meta's own validation
+  runs in the preview, the ad set states its bid strategy and budget sharing, and an account with no
+  payment method is refused before anything is created.
+- A platform connection whose stored credentials cannot be read now says so and offers a reconnect,
+  instead of failing as an unexpected error.
+- On a phone, the menu closes when you pick a page from it.
+
 ## 0.3.0
 
 - **Reads and changes are separate tools.** Every router that can change something now has a

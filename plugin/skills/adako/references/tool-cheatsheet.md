@@ -1,6 +1,6 @@
 # Adako tool cheatsheet
 
-One line per tool: name, risk, cost in tasks, and when to reach for it. 231 tools across five ad
+One line per tool: name, risk, cost in tasks, and when to reach for it. 233 tools across five ad
 platforms plus Adako itself.
 
 - **R**: read-only. Runs immediately, changes nothing.
@@ -19,13 +19,14 @@ tools marked **direct** below. Everything else goes through a router, as
   `chatgpt_ads_write`, `tiktok_ads_write`, `linkedin_ads_write` or `monitoring_write`. It only executes, and each call
   becomes a proposal. Never look anything up through it.
 
-## Adako system: 31 tools
+## Adako system: 32 tools
 
-### System (5)
+### System (6)
 
 | Tool                      | Risk | Cost | When to use                                                                                                                                                        |
 | ------------------------- | ---- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `start_here`              | R    | 0    | Call this first in a new conversation, or whenever you are unsure what the user can do.                                                                            |
+| `check_media`             | R    | 0    | Checks an image or video before an ad is built from it — repairs share links, reads the real file, judges it per platform — and, called with no arguments, says where to put a file that has no link. |
 | `get_connections_status`  | R    | 0    | Shows every platform login the user has connected, its token health (active / needs re-authorisation / revoked), and the active + primary ad accounts under it.    |
 | `list_connected_accounts` | R    | 0    | Lists every ad account Adako knows for this user, with platform id, name, currency, timezone, and whether it is active and primary.                                |
 | `switch_primary_account`  | W    | 0    | Makes one account the primary account for its platform, the one later tools use when no account id is passed, and switches it on if it was inactive.               |
@@ -211,7 +212,7 @@ Routers: `google_ads` for R, `google_ads_write` for W and D. Account argument: `
 | `google_add_audience_signal`  | W    | 1    | Adds an audience as a signal on a Performance Max asset group.                                                                                                                          |
 | `google_search_audiences`     | R    | 0    | Finds audiences usable in this account: the account's own audiences and remarketing/customer lists, plus Google's in-market and affinity interest segments when you pass a search term. |
 
-## Meta Ads: 43 tools
+## Meta Ads: 44 tools
 
 Routers: `meta_ads` for R, `meta_ads_write` for W and D. Account argument: `ad_account_id`.
 
@@ -253,7 +254,7 @@ Routers: `meta_ads` for R, `meta_ads_write` for W and D. Account argument: `ad_a
 | `meta_get_ad_set_targeting`         | R    | 0    | Renders one ad set's targeting exactly as Meta holds it: locations, age, gender, detailed targeting, custom audiences, placements, devices and the Advantage+ audience setting.              |
 | `meta_browse_targeting`             | R    | 0    | Walks Meta's targeting catalogue by category — interests, behaviours, demographics, life events, industries — instead of searching for a word.                                               |
 
-### Assets (4)
+### Assets (5)
 
 | Tool                           | Risk | Cost | When to use                                                                                                                                                     |
 | ------------------------------ | ---- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -261,6 +262,7 @@ Routers: `meta_ads` for R, `meta_ads_write` for W and D. Account argument: `ad_a
 | `meta_get_ad_creatives`        | R    | 0    | Lists the creatives used by one ad, or by every ad in an ad set: headline, primary text, destination link, format and thumbnail.                                |
 | `meta_list_instagram_accounts` | R    | 0    | Lists the Instagram accounts this ad account may use as the ad's identity, both the ones linked directly to the ad account and the ones connected to its Pages. |
 | `meta_list_promotable_apps`    | R    | 0    | Lists the mobile apps registered to this ad account's business that can be advertised, with their store URLs.                                                   |
+| `meta_list_media`              | R    | 1    | Lists the images and videos already in the ad account, with the image hash or video id to pass instead of a URL — the way in for a file with no public link.    |
 
 ### Conversions (1)
 

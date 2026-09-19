@@ -12,10 +12,44 @@ it; Adako checks it against the platform rules before anything is created.
 
 Check first, propose second. Every validator below is free and instant.
 
+## The file: where an image or video has to live
+
+Adako never receives the file. Every platform downloads it itself, from its own servers, often hours
+after the call — so an ad needs a public https link straight to the file, and that is the whole
+constraint. `check_media` is the one tool for this: free, needs no account, takes the link exactly
+as the user gave it.
+
+```
+check_media(urls=["<whatever the user pasted>"])   # repairs, checks, judges per platform
+check_media()                                      # no link yet → where to put the file
+```
+
+It rewrites the share links that serve a page instead of a file (Drive, Dropbox, OneDrive, GitHub,
+Imgur), refuses the ones that never work with the reason, reads the file's real type, size,
+dimensions and an MP4's length from its first bytes, and reports slot by slot what fits.
+
+**Three ways in, cheapest first.** Ask in this order; most users never reach the third.
+
+1. **Already in the ad account.** Anything uploaded in Ads Manager stays in the account library and
+   needs no link at all. `meta_list_media` (hash and video id), `tiktok_list_ad_videos`,
+   `google_list_assets`. Then pass `image_hash` or `video_id` instead of a URL — nothing is
+   uploaded twice, and a file with no public link still reaches an ad.
+2. **Already on their website.** Right-click the image, copy the image address. A Shopify,
+   WordPress, Webflow or Squarespace media library gives the same link from its file list.
+3. **Neither.** Upload it once in the platform's own Ads Manager — the only host they already have
+   an account with — then use door 1. For one file across several platforms, their own site or any
+   public bucket.
+
+Never works, whatever the user says: a path on their computer, a photo library link, a transfer
+service, a design-tool page, a chat attachment, a signed link that expires within a day, or a
+platform CDN address. A YouTube link is right for a Google Ads video asset and for nothing else.
+
+Say what is wrong and what to do instead. Do not retry a create with a file that was refused.
+
 | Platform     | Validator                                                       |
 | ------------ | --------------------------------------------------------------- |
 | Google Ads   | `google_validate_ad_copy`, `google_validate_and_prepare_assets` |
-| Meta Ads     | `meta_validate_creative_url`                                    |
+| Meta Ads     | `meta_validate_creative_url`, `meta_list_media`                 |
 | ChatGPT Ads  | `chatgpt_validate_chat_card`                                    |
 | TikTok Ads   | `tiktok_validate_assets`                                        |
 | LinkedIn Ads | `linkedin_validate_assets`                                      |
@@ -163,7 +197,10 @@ reached repeatedly. Let the numbers set it, not the calendar.
 ## Do not
 
 - Do not propose copy that has not been through the platform's validator.
-- Do not send an asset URL that needs a login; the platform must fetch it.
+- Do not send an asset URL that needs a login, expires, or points at a share page; run `check_media`
+  first and send the link it gives back.
+- Do not tell the user to "host it somewhere" and stop there. Offer the three doors in order — the
+  account library first, their own site second, an Ads Manager upload third.
 - Do not stretch a horizontal asset into a vertical placement.
 - Do not pause every ad in an ad set at once to "reset" it.
 - Do not call one week of falling CTR fatigue.

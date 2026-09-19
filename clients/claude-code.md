@@ -94,7 +94,7 @@ After installing, run:
 
 `start_here` reports what is connected, which account is primary, its currency and timezone, and how
 many tasks remain. If nothing is connected yet, it hands you the link to
-[adako.ai/connections](https://adako.ai/connections).
+[adako.ai/accounts](https://adako.ai/accounts).
 
 ## Notes
 
@@ -103,4 +103,4 @@ many tasks remain. If nothing is connected yet, it hands you the link to
   back as a proposal with a preview; Claude Code shows it and waits for you.
 - Created campaigns, ad sets and ads are always paused.
 - If a tool returns `needs_reauth`, the platform login expired. Reconnect at
-  [adako.ai/connections](https://adako.ai/connections); no restart needed.
+  [adako.ai/accounts](https://adako.ai/accounts); no restart needed.

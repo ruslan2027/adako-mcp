@@ -83,16 +83,23 @@ Meta has no delete tools. Pausing is the only way to stop delivery.
 
 ## The objective rules
 
-Objective, optimisation goal and billing event must agree or Meta rejects the ad set after the
-campaign row already exists. Check the draft first with `validate_campaign_draft` on the
+Objective, optimisation goal and billing event must agree; the create tool's preview refuses a
+mismatch before anything exists. Check the draft first with `validate_campaign_draft` on the
 `diagnostics` router (`platform: "meta_ads"`, `campaign_type: "image" | "video" | "carousel"`), or
 read the whole rule set with `get_campaign_spec`.
 
 Other hard requirements:
 
-- EU or EEA targeting needs `dsa_beneficiary`, and `dsa_payor` when the payer differs. Ask.
-- Housing, credit, employment, social issues, gambling and financial products need
-  `special_ad_categories`, which removes most demographic targeting. Say what is lost.
+- EU or EEA targeting (including by a region or city key) needs both `dsa_beneficiary` and
+  `dsa_payor`, usually the advertiser's legal name. Ask; the preview refuses without them, on
+  `meta_update_ad_set` too when it adds EU locations.
+- Housing, employment and financial products (formerly credit) need `special_ad_categories` and
+  `special_ad_category_country`. Meta then fixes ages at 18–65+, all genders, no behaviours or
+  lookalikes; the preview refuses anything else. Say what is lost. Political ads are refused.
+- Countries are ISO codes (`GB`, not `UK`; `GR`, not `EL`). Cities get a 25 km radius.
+- Dates are days in the ad account's time zone; the budget minimum is read from Meta per account.
+- The image, video and carousel tools refuse app promotion (use `meta_create_app_install_campaign`)
+  and instant-form lead ads (build those in Ads Manager).
 - The ad account needs an active payment method and no policy flags, or nothing delivers however the
   campaign is built.
 
