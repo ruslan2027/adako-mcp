@@ -19,8 +19,8 @@ adako tools
 
 ## Authentication
 
-Create an API key in the Adako web app (Settings → API keys). A read key can call every read tool; a
-write key adds `ads:write`, which write tools and `approve_proposal` need.
+Create an API key in the Adako web app, on the API keys page (/keys). A read key can call every
+read tool; a write key adds `ads:write`, which write tools and `approve_proposal` need.
 
 ```bash
 adako login                     # prompts; the key is not echoed on a terminal
@@ -88,14 +88,15 @@ Reads run immediately. **Writes become proposals**: the tool validates the chang
 against the platform and returns a `proposal_id` — nothing has changed on the ad platform yet.
 
 ```
-Proposal prp_01J… is waiting. Nothing has changed yet.
-Approve: https://adako.ai/approvals/prp_01J…
-Or: adako run approve_proposal --arg proposal_id=prp_01J…
+Proposal 5f0c9e2a-… is waiting. Nothing has changed yet.
+Approve: https://adako.ai/approvals/5f0c9e2a-…
+Or: adako run approve_proposal --arg proposal_id=5f0c9e2a-…
 ```
 
 That footer appears only while the proposal is waiting; approving it prints the applied change and
-its read-back instead. Approving needs a key with `ads:write`. Created campaigns are always paused. There are no delete
-commands; removing negative keywords needs `--confirm-delete`.
+its read-back instead. Approving needs a key with `ads:write`. Created campaigns are always
+paused. The few tools that remove something, such as removing negative keywords, need
+`--confirm-delete`.
 
 ## Retries
 

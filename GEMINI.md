@@ -428,8 +428,8 @@ Do not pause a campaign as the first answer to weak performance. Explain what th
 4. `schedule_brief` for a daily or weekly summary by email, with the timezone the user works in.
 5. When a monitor fires it can create a proposal. `list_pending_actions` shows them; `manage_action`
    applies or declines one. Nothing a monitor proposes runs on its own.
-6. `list_scheduled_tasks` and `manage_scheduled_task` pause, resume or delete a schedule. Prefer
-   pause; delete needs `confirm_delete: true`.
+6. `list_scheduled_tasks` lists the briefs and the monitors together; `manage_scheduled_task` pauses,
+   resumes or deletes either. Prefer pause; delete needs `confirm_delete: true`.
 
 ### Approvals
 

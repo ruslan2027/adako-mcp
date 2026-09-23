@@ -9,7 +9,7 @@ use well.
 
 - A client we do not cover yet, or a corrected config for one we do.
 - Fixes to the install steps. If a menu moved, say where it moved to.
-- Confirming a page marked **untested**. Tell us the client, the version and what you saw.
+- Confirming a client guide against the app in front of you. Tell us the client, the version and what you saw.
 - Sharpening a skill in `skills/` where an assistant reliably gets something wrong.
 - An installer that fails on a configuration shape we did not anticipate.
 
@@ -26,7 +26,7 @@ use well.
 - No comparisons to other products, and no other companies' product names.
 - No claims we cannot back: no performance numbers, no customer counts.
 - Amounts always carry their currency.
-- Mark anything you could not test yourself as **untested**.
+- Say in the pull request which steps you ran yourself and which you took from the client's own documentation.
 
 ## Editing a skill
 

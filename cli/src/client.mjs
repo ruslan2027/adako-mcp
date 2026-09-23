@@ -18,6 +18,37 @@ export class CliError extends Error {
   }
 }
 
+const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]'])
+
+/**
+ * The API key travels in the Authorization header, so it only goes over https, or plain http to
+ * this machine (a local dev server).
+ * @param {string} baseUrl
+ */
+export function assertSafeBaseUrl(baseUrl) {
+  let url
+  try {
+    url = new URL(baseUrl)
+  } catch {
+    throw new CliError(`The base URL "${baseUrl}" is not a valid URL.`, {
+      code: 'bad_base_url',
+      recoverySteps: ['Pass --base-url https://adako.ai, or unset ADAKO_BASE_URL.'],
+    })
+  }
+  if (url.protocol === 'https:') return
+  if (url.protocol === 'http:' && LOOPBACK_HOSTS.has(url.hostname)) return
+  throw new CliError(
+    `Refusing to send the API key to ${url.origin}: it needs https (plain http is allowed only for localhost, 127.0.0.1 and ::1).`,
+    {
+      code: 'insecure_base_url',
+      recoverySteps: [
+        'Use an https:// base URL, for example --base-url https://adako.ai.',
+        'Check ADAKO_BASE_URL and base_url in the config file if you did not pass --base-url.',
+      ],
+    },
+  )
+}
+
 /**
  * @typedef {Object} ApiResponse
  * @property {number} status
@@ -37,6 +68,7 @@ export class CliError extends Error {
  * @returns {Promise<ApiResponse>}
  */
 export async function apiRequest(input) {
+  assertSafeBaseUrl(input.baseUrl)
   const url = `${input.baseUrl}${input.path}`
   /** @type {Record<string, string>} */
   const headers = {

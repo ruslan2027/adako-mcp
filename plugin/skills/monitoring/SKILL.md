@@ -55,8 +55,8 @@ monitors need Pro.
 | `manage_action`         | Apply or decline one of those proposals.                                         |
 | `schedule_brief`        | Daily or weekly email brief. Pro.                                                |
 | `generate_report_now`   | One report now, stored with its own page. Pro.                                   |
-| `list_scheduled_tasks`  | Every recurring brief or report, with cadence and next run.                      |
-| `manage_scheduled_task` | Pause, resume or delete a schedule. Delete needs `confirm_delete: true`.         |
+| `list_scheduled_tasks`  | Every recurring brief and every monitor, with cadence and next run.              |
+| `manage_scheduled_task` | Pause, resume or delete a brief or a monitor. Delete needs `confirm_delete: true`. |
 | `list_reports`          | Reports newest first, with the period each covers.                               |
 
 ## Writing a rule
@@ -65,6 +65,10 @@ monitors need Pro.
 
 - `name`, short and recognisable in an email subject.
 - `platform` and optional `account_id`.
+- `all_accounts`: watch every active account on that platform instead of one. Leave `platform` out
+  as well and it covers every platform the user has connected. Each account is judged on its own
+  numbers, in its own currency and timezone, keeps its own streak, and one email a day names the
+  accounts that fired. Such a monitor takes no action and no campaign ids: both name one account.
 - `metric`: `spend`, `clicks`, `impressions`, `conversions`, `conv_value`, `ctr`, `cpc`, `cpa`,
   `cpm`, `roas`, `conversion_rate`, `cost_per_lead`, `budget_utilization`.
 - `operator`: `less_than`, `greater_than`, `changes_by`, `drops_by`, `rises_by`.
@@ -76,7 +80,8 @@ monitors need Pro.
   3 for anything noisy; one bad Saturday is not a trend.
 - `campaign_ids`, `conditions` (AND / OR), `notify_email`, `enabled`.
 - `action`: `pause_campaign` or `lower_budget` with a percent. A monitor with an action must name
-  exactly one campaign id, so the proposal it creates names one object.
+  exactly one campaign id, so the proposal it creates names one object. Actions run on Google Ads,
+  Meta Ads, LinkedIn Ads and ChatGPT Ads; a TikTok monitor emails and proposes nothing.
 
 Never invent a threshold. If the user has not named a metric, a direction and a number, ask.
 
@@ -120,8 +125,9 @@ yesterday's numbers, not a decision.
 `generate_report_now` composes one report immediately and stores it with a permanent page. Use it
 when the user wants something to forward today, not a standing schedule.
 
-`list_scheduled_tasks` shows everything recurring; `manage_scheduled_task` pauses, resumes or deletes
-one. Prefer pause: a paused brief keeps its settings and resumes in one call.
+`list_scheduled_tasks` shows everything recurring, briefs and monitors side by side;
+`manage_scheduled_task` pauses, resumes or deletes either one. Prefer pause: a paused brief keeps
+its settings, a paused monitor keeps its history, and both resume in one call.
 
 ## Do not
 

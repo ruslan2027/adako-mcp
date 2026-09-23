@@ -4,14 +4,14 @@ Adako is an MCP server and REST API that connects Claude, ChatGPT, Cursor and ot
 Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. Perplexity reaches it as a remote
 connector.
 
-**Untested** — connector support depends on your Perplexity plan and app version, and Adako has not
-been through an end-to-end check there yet. If the steps do not match what you see, write to
-[support@adako.ai](mailto:support@adako.ai).
+Custom connectors come with Pro, Max and Enterprise; a free account has no place to add one. An
+Enterprise admin can share one connector with the whole organisation. If a step does not match what
+you see, write to [support@adako.ai](mailto:support@adako.ai).
 
-## Add the connector
+## Add the connector in the browser
 
-1. Open the Perplexity desktop app and go to **Settings → Connectors**.
-2. Add a connector. Enter the name and the MCP server URL:
+1. Open [perplexity.ai/computer/connectors](https://www.perplexity.ai/computer/connectors).
+2. Add a custom connector. Enter the name and the MCP server URL, and choose OAuth:
 
    ```
    Adako
@@ -23,6 +23,14 @@ been through an end-to-end check there yet. If the steps do not match what you s
 
 3. Complete the Adako authorization screen in the browser that opens.
 4. Start a new thread and switch the Adako connector on for it.
+
+## Or in the desktop app
+
+The app and the website share one connector list, so either place sets it up for both.
+
+1. Open **Settings → Connectors**.
+2. Add a custom connector with the same name and URL, authenticating with OAuth.
+3. Complete the Adako authorization screen, then switch the connector on in a thread.
 
 ## Test it
 

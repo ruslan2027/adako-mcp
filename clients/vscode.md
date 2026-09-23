@@ -4,8 +4,7 @@ Adako is an MCP server and REST API that connects Claude, ChatGPT, Cursor and ot
 Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. VS Code reaches it through its MCP
 configuration.
 
-**Untested** — the configuration follows the documented format, but Adako has not been verified in
-VS Code yet. Tell [support@adako.ai](mailto:support@adako.ai) if a step does not match.
+Tell [support@adako.ai](mailto:support@adako.ai) if a step does not match what you see.
 
 ## Add the server
 
@@ -21,6 +20,9 @@ VS Code yet. Tell [support@adako.ai](mailto:support@adako.ai) if a step does not
   }
 }
 ```
+
+If the file already has servers, add the `adako` entry inside `"servers"` beside them, comma and
+all, rather than replacing the file.
 
 Full file, with the API-key variant: [`clients/vscode/mcp.json`](vscode/mcp.json).
 

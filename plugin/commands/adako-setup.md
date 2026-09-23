@@ -28,8 +28,9 @@ Call `start_here`. It is free and instant.
 Read what `start_here` returned.
 
 - **Nothing connected**: give them https://adako.ai/accounts and say which platform to pick.
-  Google Ads, Meta Ads, TikTok Ads and LinkedIn Ads sign in through the platform. ChatGPT Ads takes
-  an advertiser API key pasted into the web app. Never ask for a password or a token in the chat.
+  Google Ads and LinkedIn Ads sign in through the platform. Meta Ads takes an access token from a
+  system user in the user's own Meta app, and ChatGPT Ads an advertiser API key, both pasted into
+  the web app. Never ask for a password or a token in the chat.
 - **Connected but no active account**: call `list_connected_accounts`, show the accounts with their
   currency, and ask which one to work on. Then call `switch_primary_account`.
 - **Connected and active**: say which account, its currency and its timezone.

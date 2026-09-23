@@ -19,9 +19,9 @@ Connectors → Add → Custom → Web**. Members then connect it from their own 
 
 The number of custom connectors you can add depends on your Claude plan.
 
-**Untested** — the steps above follow the documented custom-connector flow, which is shared with
-claude.ai. The desktop app has not been through an end-to-end check against Adako yet. If a step does
-not match what you see, write to [support@adako.ai](mailto:support@adako.ai) and we will correct this page.
+The desktop app and claude.ai share one connector list, so a connector added in either shows in
+both. If a step does not match what you see, write to [support@adako.ai](mailto:support@adako.ai)
+and we will correct this page.
 
 ## Add the skill
 

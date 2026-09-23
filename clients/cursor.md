@@ -8,10 +8,43 @@ This repository is also packaged as a Cursor plugin for the Cursor Marketplace:
 [`.cursor-plugin/plugin.json`](../.cursor-plugin/plugin.json) adds the server and the skills in
 [`skills/`](../skills).
 
-## Option A — the installer
+## Option A — in Cursor, no files
+
+1. Click **Customize** in the left sidebar, then the **MCPs** tab.
+2. Click **New MCP Server**. Cursor opens its configuration file — `C:\Users\<you>\.cursor\mcp.json` on Windows or `/Users/<you>/.cursor/mcp.json` on macOS —
+   empty the first time, or holding the servers you already use.
+3. Add the `adako` entry inside `"mcpServers"`, beside anything already there, and save (Ctrl+S,
+   Cmd+S on a Mac). Entries are separated by commas, so put one after the entry above it.
+4. Cursor connects and opens the Adako authorization screen in your browser. After you approve it,
+   Adako appears in the MCPs tab with its tools.
+
+Beside your other servers:
+
+```json
+"adako": {
+  "url": "https://adako.ai/mcp"
+}
+```
+
+Or, if Adako is your first server, the whole file:
+
+```json
+{
+  "mcpServers": {
+    "adako": {
+      "url": "https://adako.ai/mcp"
+    }
+  }
+}
+```
+
+Nothing else in the file changes. `install/cursor.mjs` below does the same merge for you and keeps
+a backup the first time.
+
+## Option B — the installer
 
 ```bash
-node install/cursor.mjs            # ~/.cursor/mcp.json, every project
+node install/cursor.mjs            # the home-folder .cursor/mcp.json, every project
 node install/cursor.mjs --project  # .cursor/mcp.json, this repository only
 ```
 
@@ -23,9 +56,10 @@ node install/cursor.mjs --key ak_live_your_key   # send an API key instead of si
 node install/cursor.mjs --dry-run                # print the merged file, write nothing
 ```
 
-## Option B — by hand
+## Option C — by hand
 
-`~/.cursor/mcp.json` for every project, or `.cursor/mcp.json` inside one:
+The home-folder file for every project (`C:\Users\<you>\.cursor\mcp.json` on Windows or `/Users/<you>/.cursor/mcp.json` on macOS), or
+`.cursor/mcp.json` inside one project:
 
 ```json
 {
@@ -82,3 +116,6 @@ timezone, and the tasks left this period. If nothing is connected, it hands you 
 - Created campaigns, ad sets and ads are always paused.
 - `needs_reauth` means the platform login expired. Reconnect at
   [adako.ai/accounts](https://adako.ai/accounts).
+- Cursor signs in with its own `cursor://` callback. If a connection ever fails with
+  `web clients require https redirect URIs on non-loopback hosts`, you are on a build of Adako from
+  before 2026-09-20 — reconnect once the deployment is current.

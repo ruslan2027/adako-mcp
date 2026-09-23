@@ -79,8 +79,8 @@ tools marked **direct** below. Everything else goes through a router, as
 | ----------------------- | ---- | ---- | ----------------------------------------------------------------------------------------------------------------------- |
 | `schedule_brief`        | W    | 0    | **Pro+.** Sets up a daily or weekly brief composed from Adako's synced data and emailed to the operator.                |
 | `generate_report_now`   | W    | 0    | **Pro+.** Composes a report from Adako's synced data and stores it, so it also has a permanent web page.                |
-| `list_scheduled_tasks`  | R    | 0    | Lists every recurring brief or report with its cadence, delivery address, last run and next run.                        |
-| `manage_scheduled_task` | W    | 0    | Pauses, resumes or deletes a recurring brief.                                                                           |
+| `list_scheduled_tasks`  | R    | 0    | Lists everything recurring: briefs with their cadence and next run, and the monitors watching daily.                    |
+| `manage_scheduled_task` | W    | 0    | Pauses, resumes or deletes one recurring brief or one monitor.                                                          |
 | `list_reports`          | R    | 0    | Lists reports — scheduled briefs and on-demand ones — newest first, with the period each covers and a link to its page. |
 
 ## Google Ads: 70 tools

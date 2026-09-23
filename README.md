@@ -44,8 +44,10 @@ reads once. Every change runs through a `_write` tool, which asks each time and 
 `search_tools` finds the right tool from your own wording and returns its exact call line, and it is
 free. See [adako.ai/docs/routers](https://adako.ai/docs/routers).
 
-TikTok Ads and LinkedIn Ads are available on request; write to support@adako.ai if you do not see
-them on the Accounts page.
+LinkedIn Ads reads are open to everyone: connect the member who administers the ad account and every
+report, structure and forecast tool works. A change needs that ad account added to Adako's LinkedIn
+application first — send the nine-digit id to support@adako.ai. The TikTok Ads tools are on the
+surface, but TikTok accounts cannot be connected until TikTok approves Adako's developer app.
 
 ---
 
@@ -74,7 +76,8 @@ Two ways to authenticate:
 
 - **OAuth** — the client opens a browser, you sign in to Adako once. Preferred everywhere it works.
 - **API key** — create one at [adako.ai/keys](https://adako.ai/keys), send it as
-  `Authorization: Bearer ak_live_…`. Use it for clients that read a static config file.
+  `Authorization: Bearer ak_live_your_key`, where `ak_live_your_key` is replaced by the whole key
+  you copied, prefix included and nothing around it. Use it for clients that read a static config file.
 
 Pick your client.
 
@@ -147,7 +150,7 @@ Full guide: [`clients/chatgpt.md`](clients/chatgpt.md).
 One command, idempotent, and it leaves your other servers alone:
 
 ```bash
-node install/cursor.mjs            # ~/.cursor/mcp.json
+node install/cursor.mjs            # the home-folder .cursor/mcp.json
 node install/cursor.mjs --project  # .cursor/mcp.json in this repository
 ```
 
@@ -177,7 +180,7 @@ codex mcp add adako --url https://adako.ai/mcp
 codex mcp login adako
 ```
 
-Or run the installer, which rewrites one table in `~/.codex/config.toml` and leaves the rest of the
+Or run the installer, which rewrites one table in the Codex config (`C:\Users\<you>\.codex\config.toml` on Windows or `/Users/<you>/.codex/config.toml` on macOS) and leaves the rest of the
 file untouched:
 
 ```bash
@@ -194,7 +197,7 @@ Full file: [`clients/codex/config.toml`](clients/codex/config.toml). Guide:
 node install/windsurf.mjs
 ```
 
-Or add the block by hand to `~/.codeium/windsurf/mcp_config.json`:
+Or add the block by hand to `C:\Users\<you>\.codeium\windsurf\mcp_config.json` on Windows or `/Users/<you>/.codeium/windsurf/mcp_config.json` on macOS:
 
 ```json
 {
@@ -207,39 +210,50 @@ Or add the block by hand to `~/.codeium/windsurf/mcp_config.json`:
 ```
 
 Full file: [`clients/windsurf/mcp_config.json`](clients/windsurf/mcp_config.json). Guide:
-[`clients/windsurf.md`](clients/windsurf.md). **Untested** — the configuration follows the documented
-format, but Adako has not been verified in Windsurf yet.
+[`clients/windsurf.md`](clients/windsurf.md).
 
-### Gemini CLI
+### Gemini (custom app)
 
-Install the extension from this repository. It adds the server and loads the Adako skill as
-[`GEMINI.md`](GEMINI.md):
+On a computer, open [gemini.google.com/apps](https://gemini.google.com/apps), or **Settings →
+Connected apps**, then scroll to **Custom apps** at the bottom, choose **Add a custom app**, and paste
+the URL:
 
-```bash
-gemini extensions install https://github.com/ruslan2027/adako-mcp
+```
+https://adako.ai/mcp
 ```
 
-Then run `/mcp auth adako` inside Gemini CLI to sign in through the browser.
+Click **Next** and sign in. Leave the credential fields under **Advanced features** empty: Adako
+registers itself. In a chat, type `@` and pick **Adako**.
 
-Without a browser, add the server with an API key to `~/.gemini/settings.json` instead:
+Guide: [`clients/gemini.md`](clients/gemini.md). Custom apps are still rolling out, with conditions
+Google lists: a personal Google Account, English, the United States, 18 or over.
+
+### Antigravity (app, IDE and the agy CLI)
+
+All three read one file, so Adako is added once. In the desktop app: **Settings → Customizations**,
+then **Open MCP Config**. In the IDE: the agent side panel, **…** → **MCP Servers**. In the CLI:
+`/mcp`, or the file itself — `C:\Users\<you>\.gemini\config\mcp_config.json` on Windows or `/Users/<you>/.gemini/config/mcp_config.json` on macOS (Linux: `/home/<you>/.gemini/config/mcp_config.json`). Use `.agents/mcp_config.json` for one project. After saving, press **refresh** beside
+_Installed MCP Servers_ and click Adako to sign in.
 
 ```json
 {
   "mcpServers": {
     "adako": {
-      "httpUrl": "https://adako.ai/mcp",
-      "headers": {
-        "Authorization": "Bearer ${ADAKO_API_KEY}"
-      }
+      "serverUrl": "https://adako.ai/mcp"
     }
   }
 }
 ```
 
-Manifests: [`gemini-extension.json`](gemini-extension.json) (browser sign-in) and
-[`clients/gemini-cli/gemini-extension.json`](clients/gemini-cli/gemini-extension.json) (API key).
-Guide: [`clients/gemini-cli.md`](clients/gemini-cli.md). **Untested** — the extension packaging has
-not been run end to end against Adako yet.
+Antigravity signs in through the browser on the first call. Guide:
+[`clients/antigravity.md`](clients/antigravity.md).
+
+Gemini CLI stopped serving free and Pro accounts on 18 June 2026 and now runs only on paid Gemini
+and Gemini Enterprise API keys. If you are still on it, the older spelling works: `httpUrl` in
+`.gemini/settings.json` in your home folder, with the extension manifests
+[`gemini-extension.json`](gemini-extension.json) and
+[`clients/gemini-cli/gemini-extension.json`](clients/gemini-cli/gemini-extension.json). Separately,
+`agy plugin import gemini` carries an existing setup into Antigravity.
 
 ### VS Code (Copilot)
 
@@ -258,13 +272,13 @@ not been run end to end against Adako yet.
 
 VS Code handles the OAuth flow. Full file with the API-key variant:
 [`clients/vscode/mcp.json`](clients/vscode/mcp.json). Guide: [`clients/vscode.md`](clients/vscode.md).
-**Untested** — configuration follows the documented format.
 
 ### Perplexity
 
-Add Adako as a connector in the desktop app: **Settings → Connectors**, then the URL above. Guide:
-[`clients/perplexity.md`](clients/perplexity.md). **Untested** — connector support depends on your
-plan and app version.
+Add Adako as a custom connector: on the web at
+[perplexity.ai/computer/connectors](https://www.perplexity.ai/computer/connectors), or **Settings →
+Connectors** in the desktop app, then the URL above with OAuth. Custom connectors come with Pro, Max
+and Enterprise. Guide: [`clients/perplexity.md`](clients/perplexity.md).
 
 ---
 
@@ -284,7 +298,8 @@ job.
 | `creative`                                                            | Copy limits and asset specs per platform, and the fatigue playbook |
 | `monitoring`                                                          | Monitors, alerts, briefs and reports                               |
 
-- **Claude Code** — install the plugin, or copy `skills/` into `~/.claude/skills/`.
+- **Claude Code** — install the plugin, or copy `skills/` into the `.claude/skills/` folder in your
+  home directory (`C:\Users\<you>\.claude\skills\` on Windows or `/Users/<you>/.claude/skills/` on macOS).
 - **claude.ai** — upload `SKILL.md` (the same file as `skills/adako/SKILL.md`) as a skill in settings.
 - **Anything else** — paste the contents into your system prompt or project instructions.
 
@@ -325,8 +340,9 @@ package is [`@adako/cli` on npm](https://www.npmjs.com/package/@adako/cli).
 ## Connect your accounts
 
 1. Sign in at [adako.ai](https://adako.ai).
-2. Open **Accounts** and connect a platform. Google Ads, Meta Ads, TikTok Ads and LinkedIn Ads
-   sign in through the platform; ChatGPT Ads takes an advertiser API key. You never hand a password
+2. Open **Accounts** and connect a platform. Google Ads and LinkedIn Ads sign in through the
+   platform; Meta Ads takes an access token from a system user in your own Meta app; ChatGPT Ads
+   takes an advertiser API key. You never hand a password
    or a token to your AI client.
 3. Turn on the accounts Adako may work on, and pick the primary for each platform.
 4. Back in your assistant, say **"start here"**.

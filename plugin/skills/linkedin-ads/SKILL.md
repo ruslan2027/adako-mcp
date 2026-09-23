@@ -21,8 +21,12 @@ proposal the user approves. Everything else goes through `linkedin_ads`, where `
 `get_tool_schema` are free for every LinkedIn tool, changes included. Never look anything up through
 `linkedin_ads_write`.
 
-LinkedIn appears on the Accounts page only where the deployment has LinkedIn credentials. If the
-user does not see it, say it is available on request.
+Reads work on every ad account the connected member administers. Writes do not: LinkedIn allows an
+application to change only the ad accounts listed on it, so a write on an account that has not been
+added is refused with a 403 no matter what the tool sends. When that happens, do not retry and do
+not try another tool — tell the user to send support@adako.ai the nine-digit ad account id from
+Campaign Manager, and say reads keep working meanwhile. Reconnecting does not help; the list belongs
+to the application, not to them.
 
 ## Account contract
 

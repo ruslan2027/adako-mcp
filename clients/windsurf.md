@@ -4,9 +4,8 @@ Adako is an MCP server and REST API that connects Claude, ChatGPT, Cursor and ot
 Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. Windsurf reaches it through Cascade's
 MCP configuration.
 
-**Untested** — the steps below follow Windsurf's documented configuration format, but Adako has not
-been through an end-to-end check in Windsurf yet. If something does not match what you see, write to
-[support@adako.ai](mailto:support@adako.ai) and we will correct this page.
+If something does not match what you see, write to [support@adako.ai](mailto:support@adako.ai) and
+we will correct this page.
 
 ## Option A — the installer
 
@@ -14,7 +13,7 @@ been through an end-to-end check in Windsurf yet. If something does not match wh
 node install/windsurf.mjs
 ```
 
-It merges Adako into `~/.codeium/windsurf/mcp_config.json`, keeps every other server exactly as it
+It merges Adako into the Windsurf config — `C:\Users\<you>\.codeium\windsurf\mcp_config.json` on Windows or `/Users/<you>/.codeium/windsurf/mcp_config.json` on macOS — keeps every other server exactly as it
 was, and saves the previous file as `mcp_config.json.bak` the first time it changes. Running it twice
 changes nothing.
 
