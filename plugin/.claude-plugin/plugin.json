@@ -2,8 +2,8 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "adako",
   "displayName": "Adako",
-  "version": "0.3.1",
-  "description": "Ad ops for Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads from your AI assistant. Reads run instantly; every write becomes a proposal you approve. Created campaigns are paused.",
+  "version": "0.3.2",
+  "description": "Ad ops for Google Ads, Meta Ads, LinkedIn Ads and ChatGPT Ads from your AI assistant. Reads run instantly; every write becomes a proposal you approve. Created campaigns are paused.",
   "author": {
     "name": "Adako",
     "email": "support@adako.ai",
@@ -16,7 +16,6 @@
     "ads",
     "google-ads",
     "meta-ads",
-    "tiktok-ads",
     "linkedin-ads",
     "chatgpt-ads",
     "advertising",

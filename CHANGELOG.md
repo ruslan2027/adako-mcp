@@ -1,8 +1,17 @@
 # Changelog
 
 Adako is an MCP server and REST API that connects Claude, ChatGPT, Cursor and other assistants to
-Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. This file tracks what changed in the
-service and in this repository.
+Google Ads, Meta Ads, LinkedIn Ads and ChatGPT Ads. This file tracks what changed in the service and
+in this repository.
+
+## 0.3.2
+
+- **TikTok Ads is not available yet, and the listing says so.** TikTok has not approved API access
+  for Adako, so no TikTok ad account can be connected. The descriptions in `server.json` and the
+  plugin manifests no longer name TikTok, and every TikTok tool now answers that it is not available
+  before anything runs, instead of asking the user to connect an account. The `tiktok_ads` and
+  `tiktok_ads_write` routers and their tools stay listed with the same names and arguments, so
+  clients that cached the tool list keep working.
 
 ## 0.3.1
 

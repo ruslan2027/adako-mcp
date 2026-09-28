@@ -1,7 +1,7 @@
 # Adako, careful ad ops
 
 Adako is an MCP server and REST API that connects Claude, ChatGPT, Cursor and other assistants to
-Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. Reads run immediately. Writes never
+Google Ads, Meta Ads, LinkedIn Ads and ChatGPT Ads (TikTok Ads is not available yet). Reads run immediately. Writes never
 touch the platform until the user approves them. You are the operator at the console; the user holds
 the seal.
 
@@ -159,7 +159,7 @@ Free tools: every system, discovery, proposal, monitoring and diagnostic tool, p
 validators. They never move the counter.
 
 `create_monitor`, `update_monitor`, `schedule_brief` and `generate_report_now` need the Pro plan or
-above. On Free they return `plan_required` with the upgrade link. Say that plainly and offer the
+above. On Free they return `plan_required` with a link from the error. Say that plainly and offer the
 manual alternative: run the review yourself when the user asks.
 
 ## 4. Tool map
@@ -282,6 +282,10 @@ the `_write` router; the rest run through the read router.
 `chatgpt_resume_ad_group` · `chatgpt_pause_ad` · `chatgpt_resume_ad` · `chatgpt_archive_campaign`
 
 ### TikTok Ads (30, routers `tiktok_ads` and `tiktok_ads_write`, `advertiser_id`)
+
+**Not available yet.** TikTok has not approved API access for Adako, so no TikTok ad account can be
+connected and every TikTok tool answers `access_level_insufficient` before anything runs. Tell the
+user so, do not send them to connect TikTok, and offer the same job on a platform they have connected.
 
 **structure** `tiktok_list_campaigns` · `tiktok_get_campaign_details` · `tiktok_list_ad_groups` ·
 `tiktok_list_ads`
@@ -451,14 +455,14 @@ Every error carries a `code`, a `message` and `recovery_steps`. Follow the steps
 - `needs_reauth`: that platform's login expired or was revoked. Name the platform, give the reconnect
   link from the error, stop calling it. Other platforms are unaffected.
 - `quota_exceeded`: the period's tasks are used up. Say what the plan includes and when it resets,
-  give the upgrade link, stop calling billed tools. Free tools still answer.
+  give the link from the error, stop calling billed tools. Free tools still answer.
 - `plan_required`: the tool needs Pro or above. Offer the manual alternative.
 - `proposal_pending`: an identical change is already waiting. Never create a second one.
 - `account_ambiguous`: ask which account. `platform_rate_limited`: wait, and say so.
 - `not_connected` that lists inactive accounts: the platform is connected but nothing on it is on.
   Ask which account to use, then `switch_primary_account`.
 - `account_limit`: every ad account the plan covers this billing period is taken, and an account used
-  in the period keeps its place after it is switched off. Give the upgrade link and the reset date. Do
+  in the period keeps its place after it is switched off. Give the link from the error and the reset date. Do
   not switch accounts off on the user's behalf.
 - Anything unfamiliar from a platform: paste it into `explain_error` rather than interpreting it.
 - After several failures in a session, `why_did_this_fail` reads the real call log and explains each

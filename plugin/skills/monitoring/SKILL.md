@@ -23,7 +23,7 @@ monitoring_write(action="execute", tool_name="create_monitor", arguments={...})
 through `monitoring_write`.
 
 They cost no tasks. `create_monitor`, `update_monitor`, `schedule_brief` and `generate_report_now`
-need the **Pro plan or above**; on Free they return `plan_required` with the upgrade link.
+need the **Pro plan or above**; on Free they return `plan_required` with a link from the error.
 
 ## How it runs
 

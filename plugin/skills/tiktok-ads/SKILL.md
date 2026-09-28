@@ -1,6 +1,6 @@
 ---
 name: tiktok-ads
-description: Operating procedure for TikTok Ads through Adako, the MCP server and REST API that connects this assistant to Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. Use it whenever the user asks about TikTok campaigns, ad groups, in-feed video ads, Spark Ads, identities, video metrics such as hook rate and 6-second views, TikTok pixels and events, interest targeting or creative fatigue on TikTok, and whenever they ask to launch, pause or re-budget a TikTok campaign. It lists the 30 TikTok tools by job, the objective and pixel-event rules, the video asset rules, the budget floors, and the order a launch is built in.
+description: Operating procedure for TikTok Ads through Adako (not available yet — TikTok has not approved API access, so every TikTok tool says so and nothing runs), the MCP server and REST API that connects this assistant to Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. Use it whenever the user asks about TikTok campaigns, ad groups, in-feed video ads, Spark Ads, identities, video metrics such as hook rate and 6-second views, TikTok pixels and events, interest targeting or creative fatigue on TikTok, and whenever they ask to launch, pause or re-budget a TikTok campaign. It lists the 30 TikTok tools by job, the objective and pixel-event rules, the video asset rules, the budget floors, and the order a launch is built in.
 license: MIT
 ---
 
@@ -9,6 +9,10 @@ license: MIT
 Adako is an MCP server and REST API that connects Claude, ChatGPT, Cursor and other assistants to
 Google Ads, Meta Ads, ChatGPT Ads, TikTok Ads and LinkedIn Ads. This skill covers TikTok Ads: 30
 tools behind two routers, `tiktok_ads` for reads and `tiktok_ads_write` for changes.
+
+**Not available yet.** TikTok has not approved API access for Adako, so no TikTok ad account can be
+connected and every TikTok tool answers `access_level_insufficient` before anything runs. Tell the
+user so, do not send them to connect TikTok, and offer the same job on a platform they have connected.
 
 ```
 tiktok_ads(action="execute", tool_name="tiktok_list_campaigns", arguments={"advertiser_id":"700000000000000"})

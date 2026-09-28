@@ -1,0 +1,1217 @@
+{
+  "identifier": "ruslan2027-adako-mcp",
+  "name": "Adako Ads MCP: Google, Meta, LinkedIn, ChatGPT Ads",
+  "version": "0.3.2",
+  "description": "Ask why CPA rose, find wasted spend, draft paused campaigns: Google, Meta, LinkedIn Ads.",
+  "author": "Ruslan",
+  "authorUrl": "https://github.com/ruslan2027",
+  "category": "business",
+  "cloudEndpoint": "https://adako.ai/mcp",
+  "homepage": "https://github.com/ruslan2027/adako-mcp",
+  "icon": "https://adako.ai/icon.png",
+  "tags": [
+    "google-ads",
+    "meta-ads",
+    "linkedin-ads",
+    "chatgpt-ads",
+    "ppc",
+    "paid-media",
+    "ad-ops",
+    "marketing"
+  ],
+  "tools": [
+    {
+      "name": "approve_proposal",
+      "description": "🔴 DESTRUCTIVE WRITE — pauses, removes or re-budgets live objects; proposal + explicit user confirmation required. Cost: free (not counted against tasks).\n\nExecutes a pending proposal exactly once and reads the object back. Only call after the user has explicitly said yes to the specific proposal (quote its summary).\nUse when: the user's write policy is \"inbox\" and they approve in chat, or a client deferred a write.\nIf the proposal expired or was already decided, returns an error — do not re-create it silently; tell the user.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "proposal_id": {
+            "type": "string",
+            "minLength": 8,
+            "description": "Id from list_pending_proposals or the proposal_pending error"
+          },
+          "raw_data": {
+            "description": "Return compact JSON only (no markdown). Use when you will compute on the result.",
+            "type": "boolean"
+          },
+          "idempotency_key": {
+            "description": "Optional caller-supplied key; identical keys never execute twice.",
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "proposal_id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "check_media",
+      "description": "🟢 READ-ONLY — runs immediately, changes nothing. Cost: free (not counted against tasks).\n\nChecks a creative file before any ad is built from it, and answers where a file with no link yet has to go.\nUse when: the user offers an image or a video in any form — a link, a file on their computer, \"the one from our site\" — and always before a create tool that takes image_url or video_url.\nWhat it does: repairs the share links that do not serve files (Drive, Dropbox, OneDrive, GitHub, Imgur have a direct form), fetches only the head of the file to read its type, size, dimensions and an MP4's duration, and reports slot by slot which platforms accept it and what would be cropped.\nCall it with no arguments when the user has a file but no link: it returns the three ways to get one, cheapest first, starting with reusing what is already in their ad account.\nAdako hosts nothing and never receives the file. The platform downloads the URL itself, from its own servers and often hours later, which is why a local path, a login-gated page or a link that expires cannot work however it is passed.\nFree, instant, touches no ad account and creates nothing, so run it as often as needed. If a file is refused, say exactly which rule it broke and what to change — never retry a create with the same file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "urls": {
+            "description": "The file links to check, as the user gave them — share pages and http links are repaired rather than rejected. Leave this out to get the \"where do I put my file\" answer instead.",
+            "minItems": 1,
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          },
+          "platforms": {
+            "description": "Only judge these platforms. Defaults to all five, which is what to use when the user has not chosen yet.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "google_ads",
+                "meta_ads",
+                "chatgpt_ads",
+                "tiktok_ads",
+                "linkedin_ads"
+              ]
+            }
+          },
+          "kind": {
+            "description": "Only judge image slots or video slots. Defaults to what the file turns out to be.",
+            "type": "string",
+            "enum": [
+              "image",
+              "video"
+            ]
+          },
+          "raw_data": {
+            "description": "Return compact JSON only (no markdown). Use when you will compute on the result.",
+            "type": "boolean"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "get_connections_status",
+      "description": "🟢 READ-ONLY — runs immediately, changes nothing. Cost: free (not counted against tasks).\n\nShows every platform login the user has connected, its token health (active / needs re-authorisation / revoked), and the active + primary ad accounts under it.\nUse when: a platform tool failed with not_connected or needs_reauth, or before the first platform call in a conversation.\nReturns links the user can open to fix a broken connection. Reads Adako's database only — no platform calls.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "raw_data": {
+            "description": "Return compact JSON only (no markdown). Use when you will compute on the result.",
+            "type": "boolean"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "get_tool_schema",
+      "description": "🟢 READ-ONLY — runs immediately, changes nothing. Cost: free (not counted against tasks).\n\nReturns the live JSON schema of one or more tools: required fields, enums, defaults, example prompts and the exact line to call it with. Free and instant — it never touches an ad platform.\nUse when: search_tools or a router pointed you at a tool and you need its arguments before calling it; or a call failed validation and you want the real field names.\nWhen not to use: the tool is already in your tool list with its schema attached — read that instead.\nReturns: one block per tool with risk, cost, the \"How to call\" line and the schema. Pass verbose=false for a compact field/type list when you only need the names.\nIf a name is unknown, you get near matches; pick one or call search_tools. Never invent field names.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tool_names": {
+            "minItems": 1,
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "description": "Exact tool names, 1–10 of them. Use the names search_tools or a router returned."
+          },
+          "verbose": {
+            "description": "Full JSON schema (default true). false returns just field names and types.",
+            "type": "boolean"
+          },
+          "raw_data": {
+            "description": "Return compact JSON only (no markdown). Use when you will compute on the result.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "tool_names"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "get_usage_status",
+      "description": "🟢 READ-ONLY — runs immediately, changes nothing. Cost: free (not counted against tasks).\n\nReturns the user's plan, tasks used vs limit for the current period, when it resets, ad accounts used this billing period vs the plan limit, and a link to the plans.\nUse when: a tool returned quota_exceeded or account_limit, or the user asks how many tasks or accounts they have left. Free; reads Adako's database only.\nA \"task\" is one billable tool call. System tools and resolvers are free. An ad account used this period keeps its place on the plan after it is switched off.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "raw_data": {
+            "description": "Return compact JSON only (no markdown). Use when you will compute on the result.",
+            "type": "boolean"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "list_connected_accounts",
+      "description": "🟢 READ-ONLY — runs immediately, changes nothing. Cost: free (not counted against tasks).\n\nLists every ad account Adako knows for this user, with platform id, name, currency, timezone, and whether it is active and primary. Tools can only use active accounts. The plan covers a number of ad accounts per billing period across all platforms, and an account used this period keeps its place after it is switched off. Each platform has one primary account, used when a tool call names no account.\nUse when: the user mentions an account by name and you need its id, or a tool returned account_ambiguous or not_connected.\nOptional platform filter. Reads Adako's database only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "platform": {
+            "description": "Filter by platform",
+            "type": "string",
+            "enum": [
+              "google_ads",
+              "meta_ads",
+              "chatgpt_ads",
+              "tiktok_ads",
+              "linkedin_ads"
+            ]
+          },
+          "raw_data": {
+            "description": "Return compact JSON only (no markdown). Use when you will compute on the result.",
+            "type": "boolean"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "list_pending_proposals",
+      "description": "🟢 READ-ONLY — runs immediately, changes nothing. Cost: free (not counted against tasks).\n\nLists writes that were proposed but not yet approved, with their preview and expiry (48 h).\nUse when: the user asks \"what is waiting for my approval\", or after a tool returned proposal_pending. Free.\nPass proposal_ids to also get those proposals as they stand now, whatever their status (approved and applied with what exists now, rejected, failed or expired): use it when the user asks whether a change went through.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "proposal_ids": {
+            "description": "Proposals to return as they stand now, whatever their status. Omit to list only what is pending.",
+            "minItems": 1,
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 8
+            }
+          },
+          "raw_data": {
+            "description": "Return compact JSON only (no markdown). Use when you will compute on the result.",
+            "type": "boolean"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "reject_proposal",
+      "description": "🟡 WRITE — creates a proposal; nothing changes until approved. Cost: free (not counted against tasks).\n\nMarks a pending proposal as rejected so it will never execute. Store the user's reason when they give one (it improves future proposals).\nUse when: the user says no to a proposed change. Free.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "proposal_id": {
+            "type": "string",
+            "minLength": 8
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "raw_data": {
+            "description": "Return compact JSON only (no markdown). Use when you will compute on the result.",
+            "type": "boolean"
+          },
+          "idempotency_key": {
+            "description": "Optional caller-supplied key; identical keys never execute twice.",
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "proposal_id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "search_tools",
+      "description": "🟢 READ-ONLY — runs immediately, changes nothing. Cost: free (not counted against tasks).\n\nFinds the tools that do a job, ranked, from the user's own wording. Free and instant.\nUse when: you are not sure which tool to call, the user asked for something you have not seen a tool for, or a tool name you guessed came back unknown. Searching costs nothing — guessing costs a failed call.\nWhen not to use: you already know the tool name (call it, or call get_tool_schema for its arguments).\nReturns: up to top_k rows with the tool name, what it does, its risk and cost, its arguments (required ones marked) and the exact \"How to call\" line — most tools are reached through their platform router, so follow that line as written. For flat arguments that is enough to make the call; get_tool_schema adds descriptions and nested fields. A request to delete campaigns, ad groups, ad sets or ads also gets a note first: no tool does that, and what to offer instead.\nSearches every platform unless you pass platform. If nothing matches, say so and ask the user what they want to achieve; do not invent a tool name.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 300,
+            "description": "What the user wants to do, in their own words (\"stop wasting money on bad search terms\")."
+          },
+          "platform": {
+            "description": "Restrict to one platform. Leave empty to search all of them.",
+            "type": "string",
+            "enum": [
+              "google_ads",
+              "meta_ads",
+              "chatgpt_ads",
+              "tiktok_ads",
+              "linkedin_ads",
+              "system"
+            ]
+          },
+          "top_k": {
+            "description": "How many tools to return. Default 5.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "raw_data": {
+            "description": "Return compact JSON only (no markdown). Use when you will compute on the result.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "start_here",
+      "description": "🟢 READ-ONLY — runs immediately, changes nothing. Cost: free (not counted against tasks).\n\nCall this first in a new conversation, or whenever you are unsure what the user can do.\nReturns the real state of this user's Adako account: which ad platforms are connected, which accounts are active and which is primary, how many tasks remain, and three example prompts with their task cost.\nWhen not to use: you already know the connection state from an earlier call in this conversation.\nIf nothing is connected, tell the user to open the connections link; do not attempt platform tools.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "raw_data": {
+            "description": "Return compact JSON only (no markdown). Use when you will compute on the result.",
+            "type": "boolean"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "switch_primary_account",
+      "description": "🟡 WRITE — creates a proposal; nothing changes until approved. Cost: free (not counted against tasks).\n\nMakes one account the primary account for its platform, the one later tools use when no account id is passed, and switches it on if it was inactive. Other active accounts stay active. When switching it on would go over the ad accounts the plan covers this billing period, the platform's previous primary is switched off to make room if that frees a place (it stays connected); otherwise the call fails with account_limit. Changes Adako settings only; nothing on the ad platform changes, so no proposal is created.\nUse when: the user says \"use account X from now on\", or a tool returned account_ambiguous or not_connected and the user confirmed which account they mean.\nNot for: manager accounts, which hold no campaigns. If you are unsure which account the user means, ask before switching.\nThe account must already be known to Adako (see list_connected_accounts).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "platform": {
+            "type": "string",
+            "enum": [
+              "google_ads",
+              "meta_ads",
+              "chatgpt_ads",
+              "tiktok_ads",
+              "linkedin_ads"
+            ]
+          },
+          "account_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Platform account id as shown by list_connected_accounts"
+          },
+          "raw_data": {
+            "description": "Return compact JSON only (no markdown). Use when you will compute on the result.",
+            "type": "boolean"
+          },
+          "idempotency_key": {
+            "description": "Optional caller-supplied key; identical keys never execute twice.",
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "platform",
+          "account_id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "google_get_campaign_performance",
+      "description": "🟢 READ-ONLY — runs immediately, changes nothing. Cost: free (not counted against tasks).\n\nReports spend, impressions, clicks, CTR, conversions, conversion value, CPA and ROAS per campaign for a period, plus the change against the immediately preceding period of the same length.\nUse when: the user asks how campaigns performed, whether results improved, or what a campaign costs per conversion.\nDo not use it for a brief or a report to keep or forward: that is generate_report_now (monitoring router), which covers every connected account and saves a page.\nDo not use when: the user wants to know what exists rather than how it performed (google_list_campaigns), or wants search-query detail (google_analyze_search_terms).\nPass either date_range (a preset) or start_date + end_date, never both. Periods are calendar days in the account's own timezone. Money is a decimal in the account currency. CPA is blank when there were no conversions and ROAS is blank when there was no spend — say so rather than printing zero.\nIf you are unsure which account, campaign or period the user means, ask them — do not guess ids or dates.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "customer_id": {
+            "description": "Google Ads customer id (10 digits, dashes optional). Omit to use the primary account; list_connected_accounts shows the valid ids.",
+            "type": "string"
+          },
+          "date_range": {
+            "description": "Preset range. Alternatively pass start_date and end_date (YYYY-MM-DD). Never both.",
+            "type": "string",
+            "enum": [
+              "today",
+              "yesterday",
+              "last_7_days",
+              "last_14_days",
+              "last_30_days",
+              "this_month",
+              "last_month"
+            ]
+          },
+          "start_date": {
+            "description": "First day of the period (YYYY-MM-DD). Use with end_date.",
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "end_date": {
+            "description": "Last day of the period (YYYY-MM-DD). Use with start_date.",
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "campaign_ids": {
+            "description": "Limit the report to these campaign ids.",
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9]+$"
+            }
+          },
+          "limit": {
+            "description": "Maximum campaigns to return (default 50).",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "raw_data": {
+            "description": "Return compact JSON only (no markdown). Use when you will compute on the result.",
+            "type": "boolean"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "meta_get_campaign_performance",
+      "description": "🟢 READ-ONLY — runs immediately, changes nothing. Cost: free (not counted against tasks).\n\nCampaign-level results for a window, next to the same-length window before it, with the KPI each campaign's objective is actually judged on: purchases and purchase ROAS for sales, leads and cost per lead for lead generation, link clicks and CPC for traffic, reach and CPM for awareness, engagements for engagement, installs for app promotion.\nUse when: the user asks how Meta is doing, which campaigns are worth more budget, or what changed week over week.\nDo not use it for a brief or a report to keep or forward: that is generate_report_now (monitoring router), which covers every connected account and saves a page.\nDo not use to inspect settings (meta_list_campaigns) or to find waste inside an ad set (meta_analyze_wasted_spend).\nReturns \"not applicable\" rather than a blank or a zero for ROAS on objectives that record no revenue — never present a missing ROAS as a bad ROAS.\nIf the user's date wording is vague (\"recently\", \"lately\"), ask which window they mean instead of picking one.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ad_account_id": {
+            "description": "Meta ad account id such as act_1234567890. Omit it to use the primary account; if several accounts are active and none is primary the call fails and lists the valid ids.",
+            "type": "string"
+          },
+          "date_range": {
+            "description": "Preset window. The \"last N days\" ones end yesterday, so no partial day is mixed in. Either this or start_date + end_date, never both.",
+            "type": "string",
+            "enum": [
+              "today",
+              "yesterday",
+              "last_7_days",
+              "last_14_days",
+              "last_30_days",
+              "this_month",
+              "last_month"
+            ]
+          },
+          "start_date": {
+            "description": "First day, YYYY-MM-DD. Needs end_date.",
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "end_date": {
+            "description": "Last day, YYYY-MM-DD, inclusive. Needs start_date.",
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "campaign_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[0-9]+$",
+            "description": "Report on a single campaign."
+          },
+          "limit": {
+            "description": "Maximum campaigns in the table (default 25, ordered by spend).",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "raw_data": {
+            "description": "Return compact JSON only (no markdown). Use when you will compute on the result.",
+            "type": "boolean"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "chatgpt_get_performance",
+      "description": "🟢 READ-ONLY — runs immediately, changes nothing. Cost: free (not counted against tasks).\n\nReports impressions, clicks, spend, conversions and the ratios derived from them (CTR, CPC, CPM, CPA, ROAS) for a window, broken down by campaign, ad group or ad — and compares every number with the equally long period immediately before it.\nUse when: the user asks how anything is doing, whether something is working, or what changed. Scope it with campaign_id, ad_group_id or ad_id; without any of them it reports the whole account.\nDo not use it for a brief or a report to keep or forward: that is generate_report_now (monitoring router), which covers every connected account and saves a page.\nDo not use it to find out what exists — that is chatgpt_list_campaigns — and do not read a single day and call it a trend: this platform's daily numbers are noisy at small budgets, so prefer last_7_days or longer before recommending a change.\nDo not compare a partial day with a whole one. The \"last N days\" windows deliberately end yesterday for that reason.\nReturns spend as a decimal in the account currency and a percentage change per metric against the previous period. A dash in the change column means the previous period was zero, not that nothing changed. ROAS is only meaningful where the account reports attributed revenue; where it does not, it comes back empty rather than as zero.\nIf the numbers are all zero, check chatgpt_list_ads for a review verdict and chatgpt_list_campaigns for a serving issue before concluding the ads are simply performing badly.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ad_account_id": {
+            "description": "ChatGPT Ads advertiser account id. One advertiser key belongs to one account, so this is only needed when the user has connected more than one key. Omit it to use the primary account.",
+            "type": "string"
+          },
+          "level": {
+            "description": "How to break the numbers down: account (one total), campaign, ad_group or ad. Defaults to campaign.",
+            "type": "string",
+            "enum": [
+              "account",
+              "campaign",
+              "ad_group",
+              "ad"
+            ]
+          },
+          "campaign_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "description": "Only this campaign."
+          },
+          "ad_group_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "description": "Only this ad group."
+          },
+          "ad_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "description": "Only this ad."
+          },
+          "date_range": {
+            "description": "Preset window. The \"last N days\" ones end yesterday, so no partial day is mixed in. Either this or start_date + end_date, never both.",
+            "type": "string",
+            "enum": [
+              "today",
+              "yesterday",
+              "last_7_days",
+              "last_14_days",
+              "last_30_days",
+              "this_month",
+              "last_month"
+            ]
+          },
+          "start_date": {
+            "description": "First day, YYYY-MM-DD. Needs end_date.",
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "end_date": {
+            "description": "Last day, YYYY-MM-DD, inclusive. Needs start_date.",
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "compare_previous": {
+            "description": "Compare with the equally long period before the window. On by default, and still one task.",
+            "type": "boolean"
+          },
+          "limit": {
+            "description": "Maximum rows in the breakdown (default 25, by spend).",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "raw_data": {
+            "description": "Return compact JSON only (no markdown). Use when you will compute on the result.",
+            "type": "boolean"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "tiktok_get_campaign_performance",
+      "description": "🟢 READ-ONLY — runs immediately, changes nothing. Cost: free (not counted against tasks).\n\nReports spend, impressions, reach, clicks, conversions and the TikTok video metrics — 2-second and 6-second views, completion, average watch time — per campaign, and compares every number with the equally long period immediately before it.\nUse when: the user asks how TikTok is doing, whether something is working, or what changed. Scope it with campaign_id; without it you get every campaign.\nDo not use it for a brief or a report to keep or forward: that is generate_report_now (monitoring router), which covers every connected account and saves a page.\nDo not read a single day and call it a trend — TikTok's daily numbers swing hard, and video metrics keep settling for hours, which is why the presets end yesterday. Prefer last_7_days or longer before recommending anything.\nReturns three ratios worth more than the rest on this platform: hook rate (2-second views ÷ impressions) says whether the first frame stopped the scroll, hold rate (6-second views ÷ impressions) whether people stayed for the offer, and completion rate whether the edit held. A low hook rate is a creative problem and no bid change will fix it — say that plainly rather than suggesting a budget move.\nA dash in the change column means the previous period was zero, not that nothing changed. If everything is zero, check tiktok_list_ads for a rejection before concluding the ads perform badly.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "campaign_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[0-9]+$",
+            "description": "Only this campaign."
+          },
+          "advertiser_id": {
+            "description": "TikTok advertiser id (a long numeric string). Only needed when the user has authorised more than one advertiser. Omit it to use the primary one.",
+            "type": "string"
+          },
+          "date_range": {
+            "description": "Preset window. The \"last N days\" ones end yesterday, so no partial day is mixed in — it matters on TikTok, where video metrics settle for hours. Either this or start_date + end_date, never both.",
+            "type": "string",
+            "enum": [
+              "today",
+              "yesterday",
+              "last_7_days",
+              "last_14_days",
+              "last_30_days",
+              "this_month",
+              "last_month"
+            ]
+          },
+          "start_date": {
+            "description": "First day, YYYY-MM-DD. Needs end_date.",
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "end_date": {
+            "description": "Last day, YYYY-MM-DD, inclusive. Needs start_date.",
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "compare_previous": {
+            "description": "Compare with the equally long period before the window. On by default; costs no extra call.",
+            "type": "boolean"
+          },
+          "limit": {
+            "description": "Maximum rows in the breakdown (default 25, by spend).",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "raw_data": {
+            "description": "Return compact JSON only (no markdown). Use when you will compute on the result.",
+            "type": "boolean"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "linkedin_get_campaign_performance",
+      "description": "🟢 READ-ONLY — runs immediately, changes nothing. Cost: free (not counted against tasks).\n\nReports spend, impressions, clicks, CTR, CPC, CPM, leads, cost per lead and website conversions for a window, per campaign (an ad set in Campaign Manager) and in total, next to the equally long window before it so every number has a baseline.\nUse when: the user asks how LinkedIn is doing, before recommending any budget or bid change, and to decide which campaign is worth more money. Start here, not with a list tool.\nDo not use it for a brief or a report to keep or forward: that is generate_report_now (monitoring router), which covers every connected account and saves a page.\nDo not judge a LinkedIn campaign on a day or two: at typical B2B volumes a single day is noise, and LinkedIn's cost per lead is an order of magnitude above other channels by design. Use last_7_days at minimum, last_30_days for a decision about money.\nDo not read a rise in CPC as failure on its own — on LinkedIn it usually means the auction got busier, and the number that matters is cost per lead.\nReturns account totals with period-over-period change, plus a per-campaign table sorted by spend. LinkedIn ad accounts carry no reporting timezone, so every window here is UTC days.\nIf the user has not said which window, use last_30_days and say so. If a campaign shows spend but zero leads, check linkedin_list_conversions before concluding the ads are bad — an unattached conversion rule reports nothing.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ad_account_id": {
+            "description": "LinkedIn ad account id — the numeric id from Campaign Manager, as a string (\"506699162\"). Omit it to use the primary account; pass it when the user manages several.",
+            "type": "string"
+          },
+          "campaign_ids": {
+            "description": "Limit the report to these campaigns. Omit for the whole account.",
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "campaign_group_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "Limit the report to one campaign group. LinkedIn ids are numeric strings; a full urn:li:… value is also accepted."
+          },
+          "date_range": {
+            "description": "Preset window. The \"last N days\" ones end yesterday, so no partial day is mixed in. Either this or start_date + end_date, never both.",
+            "type": "string",
+            "enum": [
+              "today",
+              "yesterday",
+              "last_7_days",
+              "last_14_days",
+              "last_30_days",
+              "this_month",
+              "last_month"
+            ]
+          },
+          "start_date": {
+            "description": "First day, YYYY-MM-DD. Needs end_date.",
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "end_date": {
+            "description": "Last day, YYYY-MM-DD, inclusive. Needs start_date.",
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "compare_previous": {
+            "description": "Include the previous equally long period for comparison (default true).",
+            "type": "boolean"
+          },
+          "limit": {
+            "description": "Maximum rows to return (default 100).",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          },
+          "raw_data": {
+            "description": "Return compact JSON only (no markdown). Use when you will compute on the result.",
+            "type": "boolean"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "google_ads",
+      "description": "Reads and tool lookup for Google Ads; nothing called here changes anything. The 38 Google Ads tools that change something run through google_ads_write.\n\ngoogle_ads(action=\"execute\", tool_name=\"…\", arguments={...}). action=\"list_tools\" (the write half included) and action=\"get_tool_schema\" are free; never guess a tool_name.\naccounts=[\"…\",\"…\"] or accounts=\"all_active\": one read across up to 20 Google Ads accounts, free like every read.\nNot in this router, called by name: google_get_campaign_performance (google ads campaign performance with period-over-period change).\n\nTools by category:\n**analysis** google_analyze_search_terms, google_analyze_wasted_spend, google_explain_performance_anomaly, google_get_benchmark_context, google_get_geo_performance, google_get_hourly_performance, google_optimize_budget_allocation\n**structure** google_get_ad_creative, google_get_campaign_structure, google_list_asset_groups, google_list_campaigns\n**performance** google_get_ad_group_performance, google_get_ad_performance, google_get_asset_group_performance, google_get_device_performance\n**targeting** google_get_ad_schedule, google_get_campaign_targeting, google_list_languages\n**assets** google_get_asset_performance, google_list_assets, google_validate_and_prepare_assets\n**conversions** google_get_conversion_action_performance, google_list_conversion_actions\n**keywords** google_get_keyword_performance\n**audiences** google_get_search_themes, google_search_audiences\n**management** google_list_bidding_strategies, google_list_labels\n**research** google_research_keywords, google_resolve_locations, google_validate_ad_copy",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "list_tools",
+              "get_tool_schema",
+              "execute"
+            ],
+            "description": "The first two are free; execute bills the tool."
+          },
+          "tool_name": {
+            "description": "Exact tool name. Needed by get_tool_schema and execute.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "arguments": {
+            "description": "The tool’s own arguments, as its schema declares them.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          },
+          "accounts": {
+            "description": "Repeat one READ across these accounts, or \"all_active\"; free like every read, max 20.",
+            "anyOf": [
+              {
+                "minItems": 1,
+                "maxItems": 20,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              {
+                "type": "string",
+                "const": "all_active"
+              }
+            ]
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "google_ads_write",
+      "description": "Changes for Google Ads: the 38 Google Ads tools that create, update, pause or remove something. Reading, listing or checking anything is not here — that is google_ads, and calling this router to look something up is always wrong.\n\ngoogle_ads_write(action=\"execute\", tool_name=\"…\", arguments={...}); execute is the only action, and google_ads(action=\"get_tool_schema\") looks a tool up for free.\nEach call creates a proposal the user approves before anything changes; creates are PAUSED. One account per call, no fan-out.\n\nTools by category:\n**audiences** google_add_audience_signal, google_add_search_themes, google_remove_search_themes\n**assets** google_add_call_asset, google_add_callouts, google_add_image_assets, google_add_sitelinks, google_add_structured_snippets, google_remove_asset_links, google_set_business_name\n**keywords** google_add_keywords, google_add_negative_keywords, google_bulk_update_keyword_bids, google_bulk_update_keyword_status, google_remove_negative_keywords, google_update_keyword\n**management** google_apply_label, google_create_label, google_pause_ad, google_pause_ad_group, google_pause_campaign, google_remove_label, google_resume_ad, google_resume_ad_group, google_resume_campaign, google_set_device_bid_modifiers, google_update_bid_strategy, google_update_campaign, google_update_campaign_budget, google_update_campaign_networks\n**conversions** google_create_conversion_action, google_update_conversion_action\n**creation** google_create_pmax_campaign, google_create_responsive_search_ad, google_create_search_campaign\n**targeting** google_set_ad_schedule, google_update_campaign_languages, google_update_campaign_locations",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Always \"execute\"; list_tools and get_tool_schema live on the read router, never here."
+          },
+          "tool_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Exact name of the tool that makes the change."
+          },
+          "arguments": {
+            "description": "The tool’s own arguments, as its schema declares them.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {}
+      }
+    },
+    {
+      "name": "meta_ads",
+      "description": "Reads and tool lookup for Meta Ads; nothing called here changes anything. The 16 Meta Ads tools that change something run through meta_ads_write.\n\nmeta_ads(action=\"execute\", tool_name=\"…\", arguments={...}). action=\"list_tools\" (the write half included) and action=\"get_tool_schema\" are free; never guess a tool_name.\naccounts=[\"…\",\"…\"] or accounts=\"all_active\": one read across up to 20 Meta Ads accounts, free like every read.\nNot in this router, called by name: meta_get_campaign_performance (meta campaign performance).\n\nTools by category:\n**analysis** meta_analyze_audiences, meta_analyze_wasted_spend, meta_detect_creative_fatigue, meta_get_audience_insights, meta_optimize_budget, meta_optimize_placements\n**targeting** meta_browse_targeting, meta_get_ad_set_delivery_estimate, meta_get_ad_set_targeting, meta_search_targeting\n**diagnostics** meta_explain_anomaly, meta_validate_creative_url\n**assets** meta_get_ad_creatives, meta_list_instagram_accounts, meta_list_media, meta_list_pages, meta_list_promotable_apps\n**performance** meta_get_ad_performance, meta_get_adset_performance\n**structure** meta_get_lead_form_submissions, meta_list_ad_sets, meta_list_ads, meta_list_campaigns, meta_list_lead_forms\n**audiences** meta_list_custom_audiences, meta_list_saved_audiences\n**conversions** meta_list_pixels",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "list_tools",
+              "get_tool_schema",
+              "execute"
+            ],
+            "description": "The first two are free; execute bills the tool."
+          },
+          "tool_name": {
+            "description": "Exact tool name. Needed by get_tool_schema and execute.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "arguments": {
+            "description": "The tool’s own arguments, as its schema declares them.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          },
+          "accounts": {
+            "description": "Repeat one READ across these accounts, or \"all_active\"; free like every read, max 20.",
+            "anyOf": [
+              {
+                "minItems": 1,
+                "maxItems": 20,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              {
+                "type": "string",
+                "const": "all_active"
+              }
+            ]
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "meta_ads_write",
+      "description": "Changes for Meta Ads: the 16 Meta Ads tools that create, update, pause or remove something. Reading, listing or checking anything is not here — that is meta_ads, and calling this router to look something up is always wrong.\n\nmeta_ads_write(action=\"execute\", tool_name=\"…\", arguments={...}); execute is the only action, and meta_ads(action=\"get_tool_schema\") looks a tool up for free.\nEach call creates a proposal the user approves before anything changes; creates are PAUSED. One account per call, no fan-out.\n\nTools by category:\n**creation** meta_add_ad, meta_add_ad_set, meta_create_app_install_campaign, meta_create_carousel_campaign, meta_create_flexible_ad, meta_create_image_campaign, meta_create_video_campaign\n**management** meta_duplicate_campaign, meta_pause_entity, meta_resume_entity, meta_set_frequency_cap, meta_update_ad, meta_update_ad_set, meta_update_adset_budget, meta_update_campaign, meta_update_campaign_budget",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Always \"execute\"; list_tools and get_tool_schema live on the read router, never here."
+          },
+          "tool_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Exact name of the tool that makes the change."
+          },
+          "arguments": {
+            "description": "The tool’s own arguments, as its schema declares them.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {}
+      }
+    },
+    {
+      "name": "chatgpt_ads",
+      "description": "Reads and tool lookup for ChatGPT Ads; nothing called here changes anything. The 13 ChatGPT Ads tools that change something run through chatgpt_ads_write.\n\nchatgpt_ads(action=\"execute\", tool_name=\"…\", arguments={...}). action=\"list_tools\" (the write half included) and action=\"get_tool_schema\" are free; never guess a tool_name.\naccounts=[\"…\",\"…\"] or accounts=\"all_active\": one read across up to 20 ChatGPT Ads accounts, free like every read.\nNot in this router, called by name: chatgpt_get_performance (read chatgpt ads performance).\n\nTools by category:\n**targeting** chatgpt_geo_lookup\n**discovery** chatgpt_get_account, chatgpt_get_account_limits\n**conversions** chatgpt_get_pixel_settings, chatgpt_list_pixels\n**structure** chatgpt_list_ad_groups, chatgpt_list_ads, chatgpt_list_campaigns\n**assets** chatgpt_validate_chat_card",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "list_tools",
+              "get_tool_schema",
+              "execute"
+            ],
+            "description": "The first two are free; execute bills the tool."
+          },
+          "tool_name": {
+            "description": "Exact tool name. Needed by get_tool_schema and execute.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "arguments": {
+            "description": "The tool’s own arguments, as its schema declares them.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          },
+          "accounts": {
+            "description": "Repeat one READ across these accounts, or \"all_active\"; free like every read, max 20.",
+            "anyOf": [
+              {
+                "minItems": 1,
+                "maxItems": 20,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              {
+                "type": "string",
+                "const": "all_active"
+              }
+            ]
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "chatgpt_ads_write",
+      "description": "Changes for ChatGPT Ads: the 13 ChatGPT Ads tools that create, update, pause or remove something. Reading, listing or checking anything is not here — that is chatgpt_ads, and calling this router to look something up is always wrong.\n\nchatgpt_ads_write(action=\"execute\", tool_name=\"…\", arguments={...}); execute is the only action, and chatgpt_ads(action=\"get_tool_schema\") looks a tool up for free.\nEach call creates a proposal the user approves before anything changes; creates are PAUSED. One account per call, no fan-out.\n\nTools by category:\n**management** chatgpt_archive_campaign, chatgpt_pause_ad, chatgpt_pause_ad_group, chatgpt_pause_campaign, chatgpt_resume_ad, chatgpt_resume_ad_group, chatgpt_resume_campaign, chatgpt_update_ad, chatgpt_update_ad_group, chatgpt_update_campaign\n**creation** chatgpt_create_ad, chatgpt_create_ad_group, chatgpt_launch_ad",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Always \"execute\"; list_tools and get_tool_schema live on the read router, never here."
+          },
+          "tool_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Exact name of the tool that makes the change."
+          },
+          "arguments": {
+            "description": "The tool’s own arguments, as its schema declares them.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {}
+      }
+    },
+    {
+      "name": "tiktok_ads",
+      "description": "Reads and tool lookup for TikTok Ads; nothing called here changes anything. The 12 TikTok Ads tools that change something run through tiktok_ads_write.\n\ntiktok_ads(action=\"execute\", tool_name=\"…\", arguments={...}). action=\"list_tools\" (the write half included) and action=\"get_tool_schema\" are free; never guess a tool_name.\naccounts=[\"…\",\"…\"] or accounts=\"all_active\": one read across up to 20 TikTok Ads accounts, free like every read.\nNot in this router, called by name: tiktok_get_campaign_performance (read tiktok campaign performance).\n\nTools by category:\n**analysis** tiktok_analyze_geo_performance, tiktok_get_audience_insights\n**diagnostics** tiktok_analyze_wasted_spend, tiktok_detect_creative_fatigue\n**discovery** tiktok_explain_objective\n**performance** tiktok_get_ad_group_performance, tiktok_get_ad_performance\n**structure** tiktok_get_campaign_details, tiktok_list_ad_groups, tiktok_list_ads, tiktok_list_campaigns\n**assets** tiktok_list_ad_videos, tiktok_list_identities, tiktok_list_lead_forms, tiktok_validate_assets\n**conversions** tiktok_list_pixels\n**targeting** tiktok_search_targeting",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "list_tools",
+              "get_tool_schema",
+              "execute"
+            ],
+            "description": "The first two are free; execute bills the tool."
+          },
+          "tool_name": {
+            "description": "Exact tool name. Needed by get_tool_schema and execute.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "arguments": {
+            "description": "The tool’s own arguments, as its schema declares them.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          },
+          "accounts": {
+            "description": "Repeat one READ across these accounts, or \"all_active\"; free like every read, max 20.",
+            "anyOf": [
+              {
+                "minItems": 1,
+                "maxItems": 20,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              {
+                "type": "string",
+                "const": "all_active"
+              }
+            ]
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "tiktok_ads_write",
+      "description": "Changes for TikTok Ads: the 12 TikTok Ads tools that create, update, pause or remove something. Reading, listing or checking anything is not here — that is tiktok_ads, and calling this router to look something up is always wrong.\n\ntiktok_ads_write(action=\"execute\", tool_name=\"…\", arguments={...}); execute is the only action, and tiktok_ads(action=\"get_tool_schema\") looks a tool up for free.\nEach call creates a proposal the user approves before anything changes; creates are PAUSED. One account per call, no fan-out.\n\nTools by category:\n**creation** tiktok_add_ad, tiktok_add_ad_group, tiktok_create_video_campaign\n**management** tiktok_pause_ad, tiktok_pause_ad_group, tiktok_pause_campaign, tiktok_resume_ad, tiktok_resume_ad_group, tiktok_resume_campaign, tiktok_update_ad_group, tiktok_update_campaign\n**assets** tiktok_upload_images",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Always \"execute\"; list_tools and get_tool_schema live on the read router, never here."
+          },
+          "tool_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Exact name of the tool that makes the change."
+          },
+          "arguments": {
+            "description": "The tool’s own arguments, as its schema declares them.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {}
+      }
+    },
+    {
+      "name": "linkedin_ads",
+      "description": "Reads and tool lookup for LinkedIn Ads; nothing called here changes anything. The 17 LinkedIn Ads tools that change something run through linkedin_ads_write.\n\nNaming: these tools use LinkedIn API names. Since October 2025 Campaign Manager calls a campaign group a \"campaign\", a campaign an \"ad set\" and a creative an \"ad\", so campaign_group_id is what the user sees as a campaign and campaign_id is an ad set. When the user says \"campaign\", check which level they mean (linkedin_get_campaign_structure shows both), and answer in the words Campaign Manager uses.\n\nlinkedin_ads(action=\"execute\", tool_name=\"…\", arguments={...}). action=\"list_tools\" (the write half included) and action=\"get_tool_schema\" are free; never guess a tool_name.\naccounts=[\"…\",\"…\"] or accounts=\"all_active\": one read across up to 20 LinkedIn Ads accounts, free like every read.\nNot in this router, called by name: linkedin_get_campaign_performance (linkedin campaign (ad set) performance).\n\nTools by category:\n**analysis** linkedin_analyze_creative_performance, linkedin_analyze_wasted_spend\n**targeting** linkedin_estimate_audience_size, linkedin_forecast_campaign_supply, linkedin_search_targeting\n**discovery** linkedin_explain_objectives, linkedin_get_organizations\n**audiences** linkedin_get_audience_insights\n**structure** linkedin_get_campaign_structure, linkedin_list_campaign_groups, linkedin_list_campaigns, linkedin_list_creatives\n**performance** linkedin_get_creative_performance\n**reporting** linkedin_get_engagement_metrics\n**conversions** linkedin_list_conversions\n**assets** linkedin_validate_assets",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "list_tools",
+              "get_tool_schema",
+              "execute"
+            ],
+            "description": "The first two are free; execute bills the tool."
+          },
+          "tool_name": {
+            "description": "Exact tool name. Needed by get_tool_schema and execute.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "arguments": {
+            "description": "The tool’s own arguments, as its schema declares them.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          },
+          "accounts": {
+            "description": "Repeat one READ across these accounts, or \"all_active\"; free like every read, max 20.",
+            "anyOf": [
+              {
+                "minItems": 1,
+                "maxItems": 20,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              {
+                "type": "string",
+                "const": "all_active"
+              }
+            ]
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "linkedin_ads_write",
+      "description": "Changes for LinkedIn Ads: the 17 LinkedIn Ads tools that create, update, pause or remove something. Reading, listing or checking anything is not here — that is linkedin_ads, and calling this router to look something up is always wrong.\n\nNaming: these tools use LinkedIn API names. Since October 2025 Campaign Manager calls a campaign group a \"campaign\", a campaign an \"ad set\" and a creative an \"ad\", so campaign_group_id is what the user sees as a campaign and campaign_id is an ad set. When the user says \"campaign\", check which level they mean (linkedin_get_campaign_structure shows both), and answer in the words Campaign Manager uses.\n\nlinkedin_ads_write(action=\"execute\", tool_name=\"…\", arguments={...}); execute is the only action, and linkedin_ads(action=\"get_tool_schema\") looks a tool up for free.\nEach call creates a proposal the user approves before anything changes; creates are PAUSED. One account per call, no fan-out.\n\nTools by category:\n**creation** linkedin_add_creative, linkedin_create_campaign_group, linkedin_create_carousel_campaign, linkedin_create_image_campaign, linkedin_create_text_campaign, linkedin_create_video_campaign\n**conversions** linkedin_associate_conversion, linkedin_manage_conversions\n**management** linkedin_batch_update_campaigns, linkedin_clone_campaign, linkedin_delete_creative, linkedin_pause_campaign, linkedin_pause_creative, linkedin_resume_campaign, linkedin_resume_creative, linkedin_update_campaign, linkedin_update_campaign_group",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Always \"execute\"; list_tools and get_tool_schema live on the read router, never here."
+          },
+          "tool_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Exact name of the tool that makes the change."
+          },
+          "arguments": {
+            "description": "The tool’s own arguments, as its schema declares them.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {}
+      }
+    },
+    {
+      "name": "monitoring",
+      "description": "Reads and tool lookup for Monitoring and reporting; nothing called here changes anything. The 7 Monitoring and reporting tools that change something run through monitoring_write.\n\nmonitoring(action=\"execute\", tool_name=\"…\", arguments={...}). action=\"list_tools\" (the write half included) and action=\"get_tool_schema\" are free; never guess a tool_name.\n\nTools by category (name — what it does):\n**monitoring**\n- get_monitor_history — Show what a monitor saw each day\n- list_monitors — List the monitors on this account\n- list_pending_actions — List the changes monitors have proposed\n- test_monitor — Dry-run a monitor against the last week\n**reporting**\n- list_reports — List the reports Adako has composed\n- list_scheduled_tasks — List scheduled briefs, reports and monitors",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "list_tools",
+              "get_tool_schema",
+              "execute"
+            ],
+            "description": "The first two are free; execute bills the tool."
+          },
+          "tool_name": {
+            "description": "Exact tool name. Needed by get_tool_schema and execute.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "arguments": {
+            "description": "The tool’s own arguments, as its schema declares them.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          },
+          "accounts": {
+            "description": "Repeat one READ across these accounts, or \"all_active\"; free like every read, max 20.",
+            "anyOf": [
+              {
+                "minItems": 1,
+                "maxItems": 20,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              {
+                "type": "string",
+                "const": "all_active"
+              }
+            ]
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    },
+    {
+      "name": "monitoring_write",
+      "description": "Changes for Monitoring and reporting: the 7 Monitoring and reporting tools that create, update, pause or remove something. Reading, listing or checking anything is not here — that is monitoring, and calling this router to look something up is always wrong.\n\nmonitoring_write(action=\"execute\", tool_name=\"…\", arguments={...}); execute is the only action, and monitoring(action=\"get_tool_schema\") looks a tool up for free.\nEach call changes something for this user. One per call.\n\nTools by category (name — what it does):\n**monitoring**\n- create_monitor — Create a daily monitor on an ad account\n- delete_monitor — Delete a monitor\n- manage_action — Approve or reject a change a monitor proposed\n- update_monitor — Change or pause a monitor\n**reporting**\n- generate_report_now — Compose a performance report now\n- manage_scheduled_task — Pause, resume or delete a scheduled brief or a monitor\n- schedule_brief — Schedule a recurring performance brief by email",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Always \"execute\"; list_tools and get_tool_schema live on the read router, never here."
+          },
+          "tool_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Exact name of the tool that makes the change."
+          },
+          "arguments": {
+            "description": "The tool’s own arguments, as its schema declares them.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {}
+      }
+    },
+    {
+      "name": "diagnostics",
+      "description": "Reads and tool lookup for Diagnostics; nothing called here changes anything.\n\ndiagnostics(action=\"execute\", tool_name=\"…\", arguments={...}). action=\"list_tools\" and action=\"get_tool_schema\" are free; never guess a tool_name.\n\nTools by category (name — what it does):\n**diagnostics**\n- explain_error — Explain a platform error\n- get_campaign_spec — What a campaign needs before it can be created\n- list_what_i_can_do — Capability menu for the platforms this user has connected\n- suggest_next_action — Three concrete next steps from the real account state\n- usage_value_summary — What this account has actually used Adako for\n- validate_campaign_draft — Dry-run a campaign draft against the platform rules\n- verify_campaign_is_live — Check whether a campaign actually exists and is running\n- why_did_this_fail — Explain the recent failed calls",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "list_tools",
+              "get_tool_schema",
+              "execute"
+            ],
+            "description": "The first two are free; execute bills the tool."
+          },
+          "tool_name": {
+            "description": "Exact tool name. Needed by get_tool_schema and execute.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "arguments": {
+            "description": "The tool’s own arguments, as its schema declares them.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          },
+          "accounts": {
+            "description": "Repeat one READ across these accounts, or \"all_active\"; free like every read, max 20.",
+            "anyOf": [
+              {
+                "minItems": 1,
+                "maxItems": 20,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              {
+                "type": "string",
+                "const": "all_active"
+              }
+            ]
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      }
+    }
+  ]
+}
